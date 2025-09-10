@@ -4,26 +4,38 @@ import type { CreateContactDTO, UpdateContactDTO } from '../validations/contact.
 /**
  * Repository layer responsible for database operations on Contacts.
  *
- * By default it instantiates PrismaClient, but a custom client can be injected
- * (useful for testing or dependency management).
+ * This class isolates persistence logic using Prisma and ensures
+ * a single responsibility for all database interactions.
+ *
+ * @class ContactRepository
  */
 export class ContactRepository {
   private prisma: PrismaClient;
 
+  /**
+   * Initialize repository with Prisma client.
+   *
+   * By default, instantiates a new PrismaClient, but a custom
+   * client can be injected (useful for testing or dependency management).
+   *
+   * @constructor
+   * @param {PrismaClient} [prismaClient] - Optional Prisma client instance
+   */
   constructor(prismaClient?: PrismaClient) {
     this.prisma = prismaClient || new PrismaClient();
   }
 
   /**
-   * Retrieve all active contacts (not archived, not deleted).
+   * Retrieve paginated contacts with dynamic filters.
    *
-   * Chose to use offset-based instead of cursor-based pagination for simplicity,
+   * Defaults to listing active contacts (not archived, not deleted).
+   * Offset-based pagination is used for simplicity.
    *
    * @async
-   * @function getAll
+   * @method getAll
    * @param {number} page - Current page (defaults to 1)
    * @param {number} limit - Page size (defaults to 10)
-   * @param {Prisma.ContactWhereInput} filter - Dynamic filter for the query
+   * @param {Prisma.ContactWhereInput} [filter] - Dynamic filter criteria
    * @returns {Promise<Contact[]>} List of contacts matching the criteria
    */
   async getAll(
@@ -40,10 +52,10 @@ export class ContactRepository {
   }
 
   /**
-   * Retrieve a contact by its unique identifier.
+   * Retrieve a single contact by UUID.
    *
    * @async
-   * @function getById
+   * @method getById
    * @param {string} id - Contact UUID
    * @returns {Promise<Contact|null>} The matching contact or null if not found
    */
@@ -52,12 +64,14 @@ export class ContactRepository {
   }
 
   /**
-   * Count all contacts.
+   * Count total contacts with an optional filter.
+   *
+   * Defaults to counting active contacts (not archived, not deleted).
    *
    * @async
-   * @function count
-   * @param {Prisma.ContactWhereInput} filter - Dynamic filter for the query
-   * @returns {Promise<number>} A list of active contacts ordered by creation date
+   * @method count
+   * @param {Prisma.ContactWhereInput} [filter] - Dynamic filter criteria
+   * @returns {Promise<number>} Total number of contacts matching the filter
    */
   async count(filter: Prisma.ContactWhereInput = { archivedAt: null, deletedAt: null }): Promise<number> {
     return this.prisma.contact.count({ where: filter });
@@ -66,7 +80,9 @@ export class ContactRepository {
   /**
    * Create a new contact.
    *
-   * @param {CreateContactDTO} data - Contact payload
+   * @async
+   * @method create
+   * @param {CreateContactDTO} data - Validated contact payload
    * @returns {Promise<Contact>} The newly created contact
    */
   async create(data: CreateContactDTO): Promise<Contact> {
@@ -74,8 +90,14 @@ export class ContactRepository {
   }
 
   /**
-   * Update an existing contact.
+   * Update an existing contact with partial data.
    *
+   * Special case:
+   * - `archived = true` → sets `archivedAt` to now
+   * - `archived = false` → clears `archivedAt`
+   *
+   * @async
+   * @method update
    * @param {string} id - Contact UUID
    * @param {UpdateContactDTO} data - Fields to update
    * @returns {Promise<Contact>} The updated contact
@@ -83,22 +105,13 @@ export class ContactRepository {
   async update(id: string, data: UpdateContactDTO): Promise<Contact> {
     const { archived, name, profilePicture, lastContactAt } = data;
 
-    const updateData: Prisma.ContactUpdateInput = {};
-
-    if (name !== undefined) {
-      updateData.name = name;
-    }
-    if (profilePicture !== undefined) {
-      updateData.profilePicture = profilePicture;
-    }
-    if (lastContactAt !== undefined) {
-      updateData.lastContactAt = lastContactAt;
-    }
-    if (archived === true) {
-      updateData.archivedAt = new Date();
-    } else if (archived === false) {
-      updateData.archivedAt = null;
-    }
+    const updateData: Prisma.ContactUpdateInput = {
+      ...(name !== undefined && { name }),
+      ...(profilePicture !== undefined && { profilePicture }),
+      ...(lastContactAt !== undefined && { lastContactAt }),
+      ...(archived === true && { archivedAt: new Date() }),
+      ...(archived === false && { archivedAt: null }),
+    };
 
     return this.prisma.contact.update({
       where: { id },
@@ -109,8 +122,12 @@ export class ContactRepository {
   /**
    * Mark a contact as deleted (soft delete).
    *
+   * Instead of removing the record, sets `deletedAt` to now.
+   *
+   * @async
+   * @method delete
    * @param {string} id - Contact UUID
-   * @returns {Promise<Contact>} The updated contact with deletedAt set
+   * @returns {Promise<Contact>} The updated contact with `deletedAt` set
    */
   async delete(id: string): Promise<Contact> {
     return this.prisma.contact.update({

@@ -9,9 +9,13 @@ const validationErrorMessages = {
 /**
  * Schema for creating a new contact.
  *
- * - name: required, non-empty string
- * - profile_picture: required, must be a valid Base64 image (<= 200KB)
- * - lastContactAt: required, must be a valid ISO date string
+ * Fields:
+ * - `name`: required, non-empty string
+ * - `profilePicture`: required, base64 image string (png/jpeg/jpg), max 200KB
+ * - `lastContactAt`: required, valid ISO date string
+ *
+ * @constant
+ * @type {z.ZodObject}
  */
 export const createContactSchema = z.object({
   name: z.string().min(1, validationErrorMessages.name),
@@ -31,7 +35,15 @@ export const createContactSchema = z.object({
 
 /**
  * Schema for updating an existing contact.
- * All fields are optional — only provided fields will be updated.
+ *
+ * All fields are optional:
+ * - `name`: non-empty string if provided
+ * - `profilePicture`: base64 image string (png/jpeg/jpg), max 200KB
+ * - `lastContactAt`: valid ISO date string if provided
+ * - `archived`: boolean, true = archive, false = unarchive
+ *
+ * @constant
+ * @type {z.ZodObject}
  */
 export const updateContactSchema = z.object({
   name: z.string().min(1, validationErrorMessages.name).optional(),
@@ -46,9 +58,26 @@ export const updateContactSchema = z.object({
     }, "Image must be <= 200KB")
     .optional(),
   lastContactAt: z.string().datetime(validationErrorMessages.lastContactAt).optional(),
-  archived: z.boolean().optional(), // true = archive, false = unarchive
+  archived: z.boolean().optional(),
 });
 
-// Type for TypeScript usage
+/**
+ * TypeScript type inferred from {@link createContactSchema}.
+ *
+ * @typedef {Object} CreateContactDTO
+ * @property {string} name - Contact name
+ * @property {string} profilePicture - Base64-encoded image string
+ * @property {string} lastContactAt - ISO date string
+ */
 export type CreateContactDTO = z.infer<typeof createContactSchema>;
+
+/**
+ * TypeScript type inferred from {@link updateContactSchema}.
+ *
+ * @typedef {Object} UpdateContactDTO
+ * @property {string} [name] - Optional updated contact name
+ * @property {string} [profilePicture] - Optional base64-encoded image string
+ * @property {string} [lastContactAt] - Optional ISO date string
+ * @property {boolean} [archived] - Optional archive flag (true = archive, false = unarchive)
+ */
 export type UpdateContactDTO = z.infer<typeof updateContactSchema>;
