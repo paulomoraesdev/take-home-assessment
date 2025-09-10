@@ -1,0 +1,13 @@
+{
+  "name": "take-home-assessment",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {},
+  "keywords": [],
+  "author": "Paulo Moraes <accounts@paulomoraes.dev>",
+  "license": "ISC",
+  "description": "Take-Home Assessment project"
+}
