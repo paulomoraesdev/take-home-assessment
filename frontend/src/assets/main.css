@@ -1,3 +1,4 @@
+@import "@fontsource/questrial/400.css";
 @import "tailwindcss";
 
 html, body {
@@ -13,4 +14,8 @@ body {
 #app {
   @apply flex items-stretch justify-center; /* flex attributes */
   @apply h-full w-full;
+}
+
+.font-questrial {
+  font-family: 'Questrial', sans-serif;
 }

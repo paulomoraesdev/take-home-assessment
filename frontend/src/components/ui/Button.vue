@@ -4,18 +4,20 @@
     class="
       bg-blue-500
       text-white
-      px-4
-      py-2
-      rounded
-      hover:bg-blue-600
+      px-6
+      py-3
+      rounded-4xl
+      transition-all
+      hover:scale-[1.05]
       focus:outline-none
       focus:ring-2
       focus:ring-blue-400
       disabled:opacity-50
       disabled:cursor-not-allowed
       disabled:hover:bg-blue-500
-      transition-colors
-      duration-200
+      duration-100
+      cursor-pointer
+      font-questrial
     "
   >
     <slot />

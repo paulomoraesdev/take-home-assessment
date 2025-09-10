@@ -15,6 +15,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
+    "@fontsource/questrial": "^5.2.6",
     "@tailwindcss/vite": "^4.1.13",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.13",
