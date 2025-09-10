@@ -81,15 +81,15 @@ export class ContactRepository {
    * @returns {Promise<Contact>} The updated contact
    */
   async update(id: string, data: UpdateContactDTO): Promise<Contact> {
-    const { archived, name, imageUrl, lastContactAt } = data;
+    const { archived, name, profilePicture, lastContactAt } = data;
 
     const updateData: Prisma.ContactUpdateInput = {};
 
     if (name !== undefined) {
       updateData.name = name;
     }
-    if (imageUrl !== undefined) {
-      updateData.imageUrl = imageUrl;
+    if (profilePicture !== undefined) {
+      updateData.profilePicture = profilePicture;
     }
     if (lastContactAt !== undefined) {
       updateData.lastContactAt = lastContactAt;

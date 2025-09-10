@@ -9,7 +9,7 @@ async function main() {
   // Create 100 fake contacts
   const contacts = Array.from({ length: 100 }).map((_, i) => ({
     name: `Contact ${i + 1}`,
-    imageUrl: `https://picsum.photos/seed/${i + 1}/200/200`,
+    profilePicture: `https://picsum.photos/seed/${i + 1}/200/200`,
     lastContactAt: new Date(
       Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 30) // last 30 days
     ),

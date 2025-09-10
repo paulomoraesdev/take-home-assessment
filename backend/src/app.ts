@@ -1,6 +1,5 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import cors from '@fastify/cors'
-import multipart from '@fastify/multipart';
 
 import { config } from './config.js';
 import { authMiddleware } from './middlewares/auth.js';
@@ -28,9 +27,6 @@ export async function buildApp(): Promise<FastifyInstance> {
     origin: config.corsOrigin,
     credentials: true
   })
-
-  // Setting up multipart support
-  await app.register(multipart, { limits: config.uploadSetting });
 
   // Registering authentication middleware (applies to all routes)
   app.addHook('preHandler', authMiddleware);

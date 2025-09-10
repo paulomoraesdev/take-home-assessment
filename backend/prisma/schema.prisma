@@ -19,14 +19,14 @@ datasource db {
 // Contact model
 // Represents a contact entity with support for archiving and soft deletion
 model Contact {
-  id            String    @id @default(uuid())  @db.Uuid          /// Unique identifier for the contact (UUID)
-  name          String                                            /// Contact's name
-  imageUrl      String    @map("image_url")                       /// URL of the contact's profile image
-  lastContactAt DateTime  @map("last_contact_at")                 /// Last time the contact was reached
-  archivedAt    DateTime? @map("archived_at")                     /// Date when the contact was archived (null = active)
-  deletedAt     DateTime? @map("deleted_at")                      /// Date when the contact was marked for deletion (null = not deleted)
-  createdAt     DateTime  @default(now()) @map("created_at")      /// Record creation timestamp
-  updatedAt     DateTime  @updatedAt      @map("updated_at")      /// Record last update timestamp
+  id              String    @id @default(uuid())  @db.Uuid          /// Unique identifier for the contact (UUID)
+  name            String                                            /// Contact's name
+  profilePicture  String    @map("profile_picture")                 /// URL of the contact's profile image
+  lastContactAt   DateTime  @map("last_contact_at")                 /// Last time the contact was reached
+  archivedAt      DateTime? @map("archived_at")                     /// Date when the contact was archived (null = active)
+  deletedAt       DateTime? @map("deleted_at")                      /// Date when the contact was marked for deletion (null = not deleted)
+  createdAt       DateTime  @default(now()) @map("created_at")      /// Record creation timestamp
+  updatedAt       DateTime  @updatedAt      @map("updated_at")      /// Record last update timestamp
   
   @@map("contacts") // Map table name to snake_case convention
 }
