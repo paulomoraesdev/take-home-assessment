@@ -1,0 +1,19 @@
+<template>
+  <div 
+    class="
+      max-w-7xl
+      p-10
+      shadow-lg
+      rounded-sm
+      bg-gray-50
+      dark:bg-slate-800
+      text-slate-800
+      dark:text-slate-200
+      grow
+      flex
+      flex-col
+    "
+  >
+    <slot />
+  </div>
+</template>

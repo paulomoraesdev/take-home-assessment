@@ -4,6 +4,6 @@ import AppContent from '@/components/AppContent.vue'
 
 <template>
   <AppContent>
-    <h1>Contacts</h1>
+    <h1>Archiveds</h1>
   </AppContent>
 </template>
