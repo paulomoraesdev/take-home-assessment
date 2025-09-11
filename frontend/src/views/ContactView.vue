@@ -79,24 +79,28 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useContactsStore } from '@/stores/contacts'
 import Modal from '@/components/ui/Modal.vue'
 import Button from '@/components/ui/Button.vue'
+import type { ContactFormData } from '@/types'
 
 const router = useRouter()
+const contactsStore = useContactsStore()
 
-const form = reactive({
+const form = reactive<ContactFormData>({
   name: '',
-  email: '',
-  phone: ''
+  profilePicture: '',
+  lastContactAt: new Date()
 })
 
 const handleClose = () => {
   router.push('/')
 }
 
-const handleSubmit = () => {
-  // TODO: Implement contact save logic
-  console.log('Saving contact:', form)
-  handleClose()
+const handleSubmit = async () => {
+  const success = await contactsStore.createContact(form)
+  if (success) {
+    handleClose()
+  }
 }
 </script>

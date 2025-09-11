@@ -128,37 +128,30 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useContactsStore } from '@/stores/contacts'
 import Modal from '@/components/ui/Modal.vue'
 import Button from '@/components/ui/Button.vue'
+import type { Contact, ContactFormData } from '@/types'
 
 const router = useRouter()
 const route = useRoute()
+const contactsStore = useContactsStore()
 
 const loading = ref(true)
 const isEditing = ref(false)
-const contact = ref<any>(null)
+const contact = ref<Contact | null>(null)
 
-const form = reactive({
+const form = reactive<ContactFormData>({
   name: '',
-  email: '',
-  phone: ''
+  profilePicture: '',
+  lastContactAt: new Date()
 })
 
 const loadContact = async () => {
   loading.value = true
   try {
-    // TODO: Implement actual contact loading
-    // Simulating API call
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // Mock contact data
-    contact.value = {
-      id: route.params.id,
-      name: `Contact ${route.params.id}`,
-      email: `contact${route.params.id}@example.com`,
-      phone: `+1234567890${route.params.id}`
-    }
-    
+    const contactId = route.params.id as string
+    contact.value = await contactsStore.getContactById(contactId)
     resetForm()
   } catch (error) {
     console.error('Error loading contact:', error)
@@ -170,8 +163,8 @@ const loadContact = async () => {
 const resetForm = () => {
   if (contact.value) {
     form.name = contact.value.name
-    form.email = contact.value.email
-    form.phone = contact.value.phone || ''
+    form.profilePicture = contact.value.profilePicture
+    form.lastContactAt = contact.value.lastContactAt
   }
 }
 
@@ -185,11 +178,14 @@ const cancelEdit = () => {
   resetForm()
 }
 
-const handleSave = () => {
-  // TODO: Implement contact save logic
-  console.log('Saving contact:', form)
-  contact.value = { ...contact.value, ...form }
-  isEditing.value = false
+const handleSave = async () => {
+  if (!contact.value) return
+  
+  const updated = await contactsStore.updateContact(contact.value.id, form)
+  if (updated) {
+    contact.value = updated
+    isEditing.value = false
+  }
 }
 
 const handleClose = () => {
