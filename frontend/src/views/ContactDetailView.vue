@@ -74,11 +74,19 @@ const loadContact = async () => {
 const handleSubmit = async (formData: ContactFormData) => {
   if (!contact.value) return
   
-  const success = await contactsStore.updateContact(contact.value.id, formData)
-  if (success) {
-    setTimeout(() => {
-      handleClose()
-    }, 1000)
+  try {
+    const success = await contactsStore.updateContact(contact.value.id, formData)
+    if (success) {
+      setTimeout(() => {
+        handleClose()
+      }, 1000)
+      return { success: true }
+    } else {
+      return { success: false, error: 'Failed to update contact' }
+    }
+  } catch (error) {
+    console.error('Error in handleSubmit:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 

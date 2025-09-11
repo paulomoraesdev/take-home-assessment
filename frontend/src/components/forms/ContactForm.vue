@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted, watch } from 'vue'
+import { useContactsStore } from '@/stores/contacts'
 import SaveButton from '@/components/ui/SaveButton.vue'
 import type { Contact, ContactFormData } from '@/types'
 import type { SaveState } from '@/components/ui/SaveButton.vue'
@@ -74,6 +75,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const contactsStore = useContactsStore()
 
 const form = reactive<ContactFormData>({
   name: '',
@@ -82,6 +84,8 @@ const form = reactive<ContactFormData>({
 })
 
 const saveState = ref<SaveState>('idle')
+const originalProfilePicture = ref<string>('')
+const hasNewImage = ref<boolean>(false)
 
 const isEditing = computed(() => !!props.contact)
 
@@ -117,6 +121,7 @@ const handleImageUpload = (event: Event) => {
     const reader = new FileReader()
     reader.onload = (e) => {
       form.profilePicture = e.target?.result as string
+      hasNewImage.value = true
     }
     reader.readAsDataURL(file)
   }
@@ -127,6 +132,10 @@ const populateForm = () => {
     form.name = props.contact.name
     form.profilePicture = props.contact.profilePicture
     form.lastContactAt = props.contact.lastContactAt || new Date()
+    
+    // Store original image and reset new image flag
+    originalProfilePicture.value = props.contact.profilePicture
+    hasNewImage.value = false
   }
 }
 
@@ -149,10 +158,45 @@ const handleSubmit = async () => {
   saveState.value = 'saving'
   
   try {
-    emit('submit', { ...form })
-    saveState.value = 'success'
+    // Prepare form data - only include profilePicture if it's new
+    const formData: Partial<ContactFormData> = {
+      name: form.name,
+      lastContactAt: form.lastContactAt
+    }
+    
+    // Only include profilePicture if user uploaded a new image
+    if (hasNewImage.value) {
+      formData.profilePicture = form.profilePicture
+    }
+    
+    const result = await new Promise<{ success: boolean; error?: string }>((resolve) => {
+      // Emit and wait for parent to process
+      emit('submit', formData)
+      
+      // Since emit is synchronous, we need to wait a bit for async processing
+      // This is a temporary solution - ideally the parent should return a promise
+      setTimeout(async () => {
+        // Check if there was an error in the store
+        if (contactsStore.error) {
+          resolve({ success: false, error: contactsStore.error })
+        } else {
+          resolve({ success: true })
+        }
+      }, 100)
+    })
+    
+    if (result.success) {
+      saveState.value = 'success'
+    } else {
+      saveState.value = 'error'
+      console.error('Submit failed:', result.error)
+      setTimeout(() => {
+        saveState.value = 'idle'
+      }, 2000)
+    }
   } catch (error) {
     saveState.value = 'error'
+    console.error('Submit error:', error)
     setTimeout(() => {
       saveState.value = 'idle'
     }, 2000)

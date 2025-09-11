@@ -71,7 +71,13 @@ export class ContactRepository {
    * @throws {Error} When validation fails or API request fails
    */
   async create(data: ContactFormData): Promise<ApiResponse<Contact>> {
-    return httpClient.post<ApiResponse<Contact>>(this.basePath, data)
+    // Transform Date objects to ISO strings for API compatibility
+    const transformedData = {
+      ...data,
+      ...(data.lastContactAt && { lastContactAt: data.lastContactAt.toISOString() })
+    }
+    
+    return httpClient.post<ApiResponse<Contact>>(this.basePath, transformedData)
   }
 
   /**
@@ -88,7 +94,13 @@ export class ContactRepository {
    * @throws {Error} When contact is not found, validation fails, or API request fails
    */
   async update(id: string, data: Partial<ContactFormData>): Promise<ApiResponse<Contact>> {
-    return httpClient.put<ApiResponse<Contact>>(`${this.basePath}/${id}`, data)
+    // Transform Date objects to ISO strings for API compatibility
+    const transformedData = {
+      ...data,
+      ...(data.lastContactAt && { lastContactAt: data.lastContactAt.toISOString() })
+    }
+    
+    return httpClient.put<ApiResponse<Contact>>(`${this.basePath}/${id}`, transformedData)
   }
 
   /**

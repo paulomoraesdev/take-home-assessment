@@ -25,7 +25,9 @@ export async function buildApp(): Promise<FastifyInstance> {
   // Setting up CORS policies
   await app.register(cors, {
     origin: config.corsOrigin,
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With']
   })
 
   // Registering authentication middleware (applies to all routes)
