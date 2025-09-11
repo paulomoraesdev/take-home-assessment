@@ -338,13 +338,11 @@ export const useContactsStore = defineStore('contacts', () => {
     try {
       await contactRepository.archive(id)
       
-      // Update local state
+      // Remove contact from current list since it no longer matches the active filter
       const index = contacts.value.findIndex(contact => contact.id === id)
       if (index !== -1) {
-        contacts.value[index] = {
-          ...contacts.value[index],
-          archivedAt: new Date()
-        }
+        contacts.value.splice(index, 1)
+        total.value -= 1
       }
       
       return true
@@ -365,13 +363,11 @@ export const useContactsStore = defineStore('contacts', () => {
     try {
       await contactRepository.restore(id)
       
-      // Update local state
+      // Remove contact from current list since it no longer matches the archived filter
       const index = contacts.value.findIndex(contact => contact.id === id)
       if (index !== -1) {
-        contacts.value[index] = {
-          ...contacts.value[index],
-          archivedAt: null
-        }
+        contacts.value.splice(index, 1)
+        total.value -= 1
       }
       
       return true
