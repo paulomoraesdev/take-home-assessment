@@ -15,6 +15,7 @@ export interface ContactFormData {
   name: string
   profilePicture?: string
   lastContactAt?: Date
+  archived?: boolean
 }
 
 // API query parameters for contact listing

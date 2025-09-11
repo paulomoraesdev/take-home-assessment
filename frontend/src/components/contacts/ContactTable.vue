@@ -214,7 +214,8 @@ const handleDelete = (contact: Contact) => {
 }
 
 // Watch for changes that should trigger data fetch
+// Don't fetch immediately to avoid duplicate fetch with HomeView
 watch([activeTab, searchQuery, sortField, sortDirection, currentPage], () => {
   contactsStore.fetchContacts()
-}, { immediate: true })
+})
 </script>

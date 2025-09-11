@@ -113,12 +113,12 @@ export const useContactsStore = defineStore('contacts', () => {
       }
       
       const response = await contactRepository.getAll(queryParams)
-      
+
       contacts.value = response.data
-      currentPage.value = response.pagination.page
-      limit.value = response.pagination.limit
-      total.value = response.pagination.total
-      totalPages.value = response.pagination.totalPages
+      currentPage.value = response.meta.page
+      limit.value = response.meta.limit
+      total.value = response.meta.total
+      totalPages.value = response.meta.totalPages
       
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch contacts'

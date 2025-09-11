@@ -107,6 +107,32 @@ export class ContactRepository {
   async delete(id: string): Promise<ApiResponse<Contact>> {
     return httpClient.delete<ApiResponse<Contact>>(`${this.basePath}/${id}`)
   }
+
+  /**
+   * Archive a contact (soft delete)
+   * 
+   * @async
+   * @method archive
+   * @param {string} id - Unique UUID identifier of the contact to archive
+   * @returns {Promise<ApiResponse<Contact>>} Archived contact with archivedAt timestamp
+   * @throws {Error} When contact is not found or API request fails
+   */
+  async archive(id: string): Promise<ApiResponse<Contact>> {
+    return this.update(id, { archived: true })
+  }
+
+  /**
+   * Restore an archived contact
+   * 
+   * @async
+   * @method restore
+   * @param {string} id - Unique UUID identifier of the contact to restore
+   * @returns {Promise<ApiResponse<Contact>>} Restored contact with archivedAt set to null
+   * @throws {Error} When contact is not found or API request fails
+   */
+  async restore(id: string): Promise<ApiResponse<Contact>> {
+    return this.update(id, { archived: false })
+  }
 }
 
 /**
