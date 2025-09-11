@@ -71,7 +71,7 @@ export class ContactController {
 
     if (!result.data?.id || result.data?.deletedAt) throw new Error('NotFound');
 
-    return reply.send({ data: result });
+    return reply.send(result);
   }
 
   /**

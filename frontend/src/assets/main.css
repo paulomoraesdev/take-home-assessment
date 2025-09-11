@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 html, body {
-  @apply h-full w-full; /* full attributes */
+  @apply min-h-full w-full; /* full attributes */
   @apply transition-colors duration-300; /* transition attributes */
 }
 
@@ -13,7 +13,7 @@ body {
 
 #app {
   @apply flex items-stretch justify-center; /* flex attributes */
-  @apply h-full w-full;
+  @apply min-h-full w-full;
 }
 
 .font-questrial {

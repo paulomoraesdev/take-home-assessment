@@ -81,7 +81,28 @@ export const useContactsStore = defineStore('contacts', () => {
   const isEditMode = computed(() => isModalOpen.value && hasCurrentContact.value)
   const isCreateMode = computed(() => isModalOpen.value && !hasCurrentContact.value)
 
-  // Actions
+  // ===== UTILITY FUNCTIONS =====
+  /**
+   * Transform date strings to Date objects
+   * 
+   * Converts API response date strings to proper Date objects for frontend use.
+   * Handles null values appropriately for optional date fields.
+   * 
+   * @param {any} contact - Contact object with potential string dates
+   * @returns {Contact} Contact with proper Date objects
+   */
+  function transformContactDates(contact: any): Contact {
+    return {
+      ...contact,
+      lastContactAt: contact.lastContactAt ? new Date(contact.lastContactAt) : new Date(),
+      archivedAt: contact.archivedAt ? new Date(contact.archivedAt) : null,
+      deletedAt: contact.deletedAt ? new Date(contact.deletedAt) : null,
+      createdAt: contact.createdAt ? new Date(contact.createdAt) : new Date(),
+      updatedAt: contact.updatedAt ? new Date(contact.updatedAt) : new Date(),
+    }
+  }
+
+  // ===== ACTIONS =====
   /**
    * Fetch contacts from the API with optional parameters
    * 
@@ -114,7 +135,7 @@ export const useContactsStore = defineStore('contacts', () => {
       
       const response = await contactRepository.getAll(queryParams)
 
-      contacts.value = response.data
+      contacts.value = response.data.map(transformContactDates)
       currentPage.value = response.meta.page
       limit.value = response.meta.limit
       total.value = response.meta.total
@@ -131,7 +152,7 @@ export const useContactsStore = defineStore('contacts', () => {
   async function getContactById(id: string): Promise<Contact | null> {
     try {
       const response = await contactRepository.getById(id)
-      return response.data
+      return response.data ? transformContactDates(response.data) : null
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch contact'
       console.error('Error fetching contact:', err)
@@ -158,14 +179,15 @@ export const useContactsStore = defineStore('contacts', () => {
     
     try {
       const response = await contactRepository.create(data)
+      const createdContact = transformContactDates(response.data)
       
       // Add to local state if we're on the first page
       if (currentPage.value === 1) {
-        contacts.value.unshift(response.data)
+        contacts.value.unshift(createdContact)
         total.value += 1
       }
       
-      return response.data
+      return createdContact
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to create contact'
       console.error('Error creating contact:', err)
@@ -181,14 +203,15 @@ export const useContactsStore = defineStore('contacts', () => {
     
     try {
       const response = await contactRepository.update(id, data)
+      const updatedContact = transformContactDates(response.data)
       
       // Update local state
       const index = contacts.value.findIndex(contact => contact.id === id)
       if (index !== -1) {
-        contacts.value[index] = response.data
+        contacts.value[index] = updatedContact
       }
       
-      return response.data
+      return updatedContact
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update contact'
       console.error('Error updating contact:', err)

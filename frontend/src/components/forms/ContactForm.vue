@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted, watch } from 'vue'
 import SaveButton from '@/components/ui/SaveButton.vue'
 import type { Contact, ContactFormData } from '@/types'
 import type { SaveState } from '@/components/ui/SaveButton.vue'
@@ -86,7 +86,8 @@ const saveState = ref<SaveState>('idle')
 const isEditing = computed(() => !!props.contact)
 
 // Helper to convert Date to MM/DD/YYYY input format
-const formatDateForInput = (date: Date): string => {
+const formatDateForInput = (date: Date | undefined): string => {
+  if (!date) return ''
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   const year = date.getFullYear()
@@ -95,6 +96,7 @@ const formatDateForInput = (date: Date): string => {
 
 // Helper to convert MM/DD/YYYY input to Date
 const parseInputDate = (dateString: string): Date => {
+  if (!dateString.trim()) return new Date()
   // Parse MM/DD/YYYY format
   const [month, day, year] = dateString.split('/')
   return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
@@ -120,12 +122,27 @@ const handleImageUpload = (event: Event) => {
   }
 }
 
-onMounted(() => {
+const populateForm = () => {
   if (props.contact) {
     form.name = props.contact.name
     form.profilePicture = props.contact.profilePicture
-    form.lastContactAt = props.contact.lastContactAt
+    form.lastContactAt = props.contact.lastContactAt || new Date()
   }
+}
+
+// Watch for contact prop changes to populate form
+watch(
+  () => props.contact,
+  (newContact) => {
+    if (newContact) {
+      populateForm()
+    }
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  populateForm()
 })
 
 const handleSubmit = async () => {
