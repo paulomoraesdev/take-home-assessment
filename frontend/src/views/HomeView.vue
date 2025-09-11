@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import AppContainer from '@/components/AppContainer.vue'
-import AppHeader from '@/components/AppHeader.vue'
-import AppContent from '@/components/AppContent.vue'
+import AppContainer from '@/components/layout/AppContainer.vue'
+import AppHeader from '@/components/layout/AppHeader.vue'
+import AppContent from '@/components/layout/AppContent.vue'
 import Button from '@/components/ui/Button.vue'
 </script>
 
