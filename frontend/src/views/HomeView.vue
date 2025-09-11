@@ -9,7 +9,11 @@ import Button from '@/components/ui/Button.vue'
 <template>
   <AppContainer>
     <AppHeader>
-      <h1 class="font-questrial font-bold text-5xl">Contacts</h1>
+      <h1 
+        class="font-questrial font-bold text-5xl text-slate-900 dark:text-gray-100"
+      >
+        Contacts
+      </h1>
       <RouterLink to="/contact">
         <Button aria-label="Add new contact">
           + Add Contact

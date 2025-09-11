@@ -7,13 +7,14 @@
         @click.self="handleOverlayClick"
       >
         <!-- Overlay/Backdrop -->
-        <div class="absolute inset-0 bg-white/60 backdrop-blur-[1px]"></div>
+        <div class="absolute inset-0 bg-white/60 dark:bg-black/50 backdrop-blur-[1px]"></div>
         
         <!-- Modal Content -->
         <div 
           class="
             relative
             bg-white
+            dark:bg-slate-800
             rounded-lg
             shadow-xl
             max-w-xl

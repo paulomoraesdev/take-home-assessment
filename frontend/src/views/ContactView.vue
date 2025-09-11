@@ -7,7 +7,7 @@
   >
     <template #header>
       <h2 id="contact-title" class="text-xl font-semibold text-gray-900">
-        Add New Contact
+        Create a new contact
       </h2>
     </template>
     
@@ -61,16 +61,15 @@
         <Button 
           type="button" 
           @click="handleClose"
-          class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+          class="bg-red-500 text-red-800 dark:text-gray-50"
         >
           Cancel
         </Button>
         <Button 
           type="submit" 
           @click="handleSubmit"
-          class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
         >
-          Save Contact
+          Save
         </Button>
       </div>
     </template>
