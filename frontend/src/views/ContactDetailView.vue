@@ -71,7 +71,7 @@ const loadContact = async () => {
   }
 }
 
-const handleSubmit = async (formData: ContactFormData) => {
+const handleSubmit = async (formData: Partial<ContactFormData>) => {
   if (!contact.value) return
   
   try {

@@ -15,23 +15,60 @@
     </div>
     
     <div>
-      <label for="profilePicture" class="block text-sm font-medium text-gray-700 mb-1">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
         Profile Picture
       </label>
+      
+      <!-- File input (hidden) -->
       <input
-        id="profilePicture"
+        ref="fileInputRef"
         type="file"
         accept="image/*"
-        @change="handleImageUpload"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        @change="handleFileSelect"
+        class="hidden"
       />
-      <div v-if="form.profilePicture" class="mt-2">
-        <img 
-          :src="form.profilePicture" 
-          alt="Profile preview" 
-          class="w-16 h-16 rounded-full object-cover"
-        />
+      
+      <!-- Upload/Preview Area -->
+      <div class="space-y-3">
+        <div v-if="!form.profilePicture" 
+             class="flex items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+             @click="triggerFileInput"
+        >
+          <div class="text-center">
+            <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <p class="text-sm text-gray-500">Click to upload image</p>
+            <p class="text-xs text-gray-400">PNG, JPG up to 200KB</p>
+          </div>
+        </div>
+        
+        <div v-else class="flex items-center space-x-3">
+          <img 
+            :src="form.profilePicture" 
+            alt="Profile preview" 
+            class="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+          />
+          <div class="flex-1">
+            <p class="text-sm text-gray-600 mb-2">Profile picture uploaded</p>
+            <button
+              type="button"
+              @click="triggerFileInput"
+              class="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Change
+            </button>
+          </div>
+        </div>
       </div>
+      
+      <!-- Image Cropper Modal -->
+      <ImageCropper
+        :show="showCropper"
+        :image="selectedImageForCrop"
+        @close="closeCropper"
+        @crop="handleCroppedImage"
+      />
     </div>
     
     <div>
@@ -62,6 +99,7 @@
 import { reactive, ref, computed, onMounted, watch } from 'vue'
 import { useContactsStore } from '@/stores/contacts'
 import SaveButton from '@/components/ui/SaveButton.vue'
+import ImageCropper from '@/components/ui/ImageCropper.vue'
 import type { Contact, ContactFormData } from '@/types'
 import type { SaveState } from '@/components/ui/SaveButton.vue'
 
@@ -70,7 +108,7 @@ interface Props {
 }
 
 interface Emits {
-  submit: [formData: ContactFormData]
+  submit: [formData: Partial<ContactFormData>]
 }
 
 const props = defineProps<Props>()
@@ -86,6 +124,11 @@ const form = reactive<ContactFormData>({
 const saveState = ref<SaveState>('idle')
 const originalProfilePicture = ref<string>('')
 const hasNewImage = ref<boolean>(false)
+
+// Cropper state
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const showCropper = ref(false)
+const selectedImageForCrop = ref('')
 
 const isEditing = computed(() => !!props.contact)
 
@@ -113,19 +156,61 @@ const lastContactDateInput = computed({
   }
 })
 
-const handleImageUpload = (event: Event) => {
+// Image upload and cropping functions
+const triggerFileInput = () => {
+  fileInputRef.value?.click()
+}
+
+const handleFileSelect = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      form.profilePicture = e.target?.result as string
-      hasNewImage.value = true
-    }
-    reader.readAsDataURL(file)
+  if (!file) return
+  
+  // Validate file size (5MB max before cropping)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('File size must be less than 5MB. Please choose a smaller image.')
+    target.value = ''
+    return
   }
+  
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (!allowedTypes.includes(file.type.toLowerCase())) {
+    alert('Please select a JPG or PNG image file.')
+    target.value = ''
+    return
+  }
+  
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const result = e.target?.result as string
+    if (result) {
+      selectedImageForCrop.value = result
+      showCropper.value = true
+    }
+  }
+  reader.onerror = () => {
+    alert('Error reading file. Please try again.')
+    target.value = ''
+  }
+  reader.readAsDataURL(file)
+  
+  // Reset file input
+  target.value = ''
 }
+
+const handleCroppedImage = (croppedImage: string) => {
+  form.profilePicture = croppedImage
+  hasNewImage.value = true
+  showCropper.value = false
+}
+
+const closeCropper = () => {
+  showCropper.value = false
+  selectedImageForCrop.value = ''
+}
+
 
 const populateForm = () => {
   if (props.contact) {

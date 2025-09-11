@@ -33,8 +33,15 @@ const handleClose = () => {
   router.push('/')
 }
 
-const handleSubmit = async (formData: ContactFormData) => {
-  const success = await contactsStore.createContact(formData)
+const handleSubmit = async (formData: Partial<ContactFormData>) => {
+  // Ensure required fields are present for creation
+  const completeFormData: ContactFormData = {
+    name: formData.name || '',
+    profilePicture: formData.profilePicture,
+    lastContactAt: formData.lastContactAt || new Date()
+  }
+  
+  const success = await contactsStore.createContact(completeFormData)
   
   if (success) {
     setTimeout(() => {
