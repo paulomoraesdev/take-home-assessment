@@ -4,8 +4,11 @@ import { contactRepository } from '@/repositories/ContactRepository'
 import type { Contact, ContactFormData, ContactsQueryParams } from '@/types'
 
 type SortField = 'name' | 'lastContactAt' | 'createdAt'
-type SortOrder = 'asc' | 'desc'
+type SortDirection = 'asc' | 'desc'
 type ContactTab = 'active' | 'archived'
+
+// Export types for use in components
+export type { SortField, SortDirection, ContactTab }
 
 /**
  * Contacts management store with CRUD operations, table state, and modal state
@@ -37,7 +40,7 @@ export const useContactsStore = defineStore('contacts', () => {
   
   // Sorting
   const sortField = ref<SortField>('name')
-  const sortOrder = ref<SortOrder>('asc')
+  const sortDirection = ref<SortDirection>('asc')
   
   // ===== MODAL STATE =====
   const currentContact = ref<Contact | null>(null)
@@ -46,12 +49,26 @@ export const useContactsStore = defineStore('contacts', () => {
 
   // ===== COMPUTED VALUES =====
   // Contact data computed
-  const hasContacts = computed(() => contacts.value.length > 0)
+  const hasContacts = computed(() => total.value > 0)
   const activeContacts = computed(() => contacts.value.filter(c => !c.archivedAt))
   const archivedContacts = computed(() => contacts.value.filter(c => c.archivedAt))
   const displayedContacts = computed(() => 
     activeTab.value === 'active' ? activeContacts.value : archivedContacts.value
   )
+  const activeCount = computed(() => activeContacts.value.length)
+  const archivedCount = computed(() => archivedContacts.value.length)
+  
+  // Search computed
+  const searchQuery = computed({
+    get: () => search.value,
+    set: (value: string) => {
+      search.value = value
+      currentPage.value = 1
+    }
+  })
+  
+  // Additional table computed
+  const perPage = computed(() => limit.value)
   
   // Table UI computed
   const hasMorePages = computed(() => currentPage.value < totalPages.value)
@@ -206,16 +223,80 @@ export const useContactsStore = defineStore('contacts', () => {
   }
 
   /**
-   * Update the search query and reset pagination
+   * Archive a contact
    * 
-   * Sets the search filter and resets to the first page. Call fetchContacts()
-   * after this to apply the new search filter.
-   * 
-   * @param {string} query - Search query string to filter contact names
+   * @param {string} id - Contact ID to archive
+   * @returns {Promise<boolean>} Success status
    */
-  function setSearch(query: string) {
-    search.value = query
-    currentPage.value = 1 // Reset to first page when searching
+  async function archiveContact(id: string): Promise<boolean> {
+    try {
+      await contactRepository.archive(id)
+      
+      // Update local state
+      const index = contacts.value.findIndex(contact => contact.id === id)
+      if (index !== -1) {
+        contacts.value[index] = {
+          ...contacts.value[index],
+          archivedAt: new Date()
+        }
+      }
+      
+      return true
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to archive contact'
+      console.error('Error archiving contact:', err)
+      return false
+    }
+  }
+
+  /**
+   * Restore an archived contact
+   * 
+   * @param {string} id - Contact ID to restore
+   * @returns {Promise<boolean>} Success status
+   */
+  async function restoreContact(id: string): Promise<boolean> {
+    try {
+      await contactRepository.restore(id)
+      
+      // Update local state
+      const index = contacts.value.findIndex(contact => contact.id === id)
+      if (index !== -1) {
+        contacts.value[index] = {
+          ...contacts.value[index],
+          archivedAt: null
+        }
+      }
+      
+      return true
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to restore contact'
+      console.error('Error restoring contact:', err)
+      return false
+    }
+  }
+
+  /**
+   * Update the search query and reset pagination
+   */
+  function updateSearchQuery(query: string) {
+    searchQuery.value = query
+  }
+
+  /**
+   * Update sort field and reset pagination
+   */
+  function updateSortField(field: SortField) {
+    sortField.value = field
+    currentPage.value = 1
+  }
+
+  /**
+   * Toggle sort direction
+   */
+  function toggleSortDirection() {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    currentPage.value = 1
   }
 
   // ===== TABLE UI ACTIONS =====
@@ -235,15 +316,15 @@ export const useContactsStore = defineStore('contacts', () => {
   /**
    * Set table sorting and refresh data
    * 
-   * Updates sort field and order, then refreshes the contact list.
+   * Updates sort field and direction, then refreshes the contact list.
    * Currently handles sorting client-side until backend support is added.
    * 
    * @param {SortField} field - Field to sort by
-   * @param {SortOrder} order - Sort direction ('asc' or 'desc')
+   * @param {SortDirection} direction - Sort direction ('asc' or 'desc')
    */
-  async function setSorting(field: SortField, order: SortOrder) {
+  async function setSorting(field: SortField, direction: SortDirection) {
     sortField.value = field
-    sortOrder.value = order
+    sortDirection.value = direction
     currentPage.value = 1
     await fetchContacts()
   }
@@ -357,7 +438,9 @@ export const useContactsStore = defineStore('contacts', () => {
     search,
     activeTab,
     sortField,
-    sortOrder,
+    sortDirection,
+    searchQuery,
+    perPage,
     
     // ===== MODAL STATE =====
     currentContact,
@@ -370,6 +453,8 @@ export const useContactsStore = defineStore('contacts', () => {
     activeContacts,
     archivedContacts,
     displayedContacts,
+    activeCount,
+    archivedCount,
     
     // Table computed
     hasMorePages,
@@ -390,9 +475,13 @@ export const useContactsStore = defineStore('contacts', () => {
     deleteContact,
     
     // ===== TABLE UI ACTIONS =====
-    setSearch,
+    updateSearchQuery,
+    updateSortField,
+    toggleSortDirection,
     setActiveTab,
     setSorting,
+    archiveContact,
+    restoreContact,
     
     // ===== MODAL ACTIONS =====
     openCreateModal,

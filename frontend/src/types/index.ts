@@ -6,3 +6,6 @@ export * from './api'
 
 // UI component types  
 export * from './ui'
+
+// Store types
+export type { ContactTab } from '@/stores/contacts'

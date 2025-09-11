@@ -41,8 +41,10 @@
       <input
         id="lastContactAt"
         v-model="lastContactDateInput"
-        type="date"
+        type="text"
         required
+        placeholder="MM/DD/YYYY"
+        pattern="^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$"
         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
@@ -83,17 +85,19 @@ const saveState = ref<SaveState>('idle')
 
 const isEditing = computed(() => !!props.contact)
 
-// Helper to convert Date to date input format
+// Helper to convert Date to MM/DD/YYYY input format
 const formatDateForInput = (date: Date): string => {
-  const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  const year = date.getFullYear()
+  return `${month}/${day}/${year}`
 }
 
-// Helper to convert date input to Date
+// Helper to convert MM/DD/YYYY input to Date
 const parseInputDate = (dateString: string): Date => {
-  return new Date(dateString + 'T00:00:00')
+  // Parse MM/DD/YYYY format
+  const [month, day, year] = dateString.split('/')
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
 }
 
 const lastContactDateInput = computed({
