@@ -50,11 +50,10 @@
             class="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
           />
           <div class="flex-1">
-            <p class="text-sm text-gray-600 mb-2">Profile picture uploaded</p>
             <button
               type="button"
               @click="triggerFileInput"
-              class="text-sm text-blue-600 hover:text-blue-800"
+              class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
             >
               Change
             </button>

@@ -29,17 +29,6 @@
         />
       </div>
       
-      <!-- Preview Section -->
-      <div v-if="preview" class="flex items-center justify-center space-x-4 p-4 bg-gray-50 rounded-lg">
-        <div class="text-sm text-gray-600">
-          Preview:
-        </div>
-        <img 
-          :src="preview" 
-          alt="Crop preview" 
-          class="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-        />
-      </div>
       
       <!-- Action Buttons -->
       <div class="flex justify-end space-x-3 pt-4">
@@ -92,7 +81,6 @@ const emit = defineEmits<Emits>()
 const cropperRef = ref<InstanceType<typeof Cropper> | null>(null)
 const cropperReady = ref(false)
 const processing = ref(false)
-const preview = ref<string>('')
 
 // Default size function for responsive cropper
 const cropperDefaultSize = {
@@ -123,32 +111,12 @@ const stencilProps = {
 // Watch for image changes to reset state
 watch(() => props.image, () => {
   cropperReady.value = false
-  preview.value = ''
 })
 
 const onCropperReady = () => {
   cropperReady.value = true
-  updatePreview()
 }
 
-const updatePreview = () => {
-  if (!cropperRef.value || !cropperReady.value) return
-  
-  try {
-    const canvas = (cropperRef.value as any).getCanvas({
-      width: 200,
-      height: 200,
-      imageSmoothingEnabled: true,
-      imageSmoothingQuality: 'high'
-    })
-    
-    if (canvas) {
-      preview.value = canvas.toDataURL('image/jpeg', 0.9)
-    }
-  } catch (error) {
-    console.error('Error generating preview:', error)
-  }
-}
 
 const handleCancel = () => {
   emit('close')
@@ -178,12 +146,6 @@ const handleConfirm = async () => {
   }
 }
 
-// Update preview when cropper changes
-watch(cropperReady, () => {
-  if (cropperReady.value) {
-    updatePreview()
-  }
-})
 </script>
 
 <style scoped>
