@@ -24,4 +24,6 @@ export interface ContactsQueryParams {
   limit?: number
   archived?: boolean
   s?: string // search
+  sortBy?: string // field to sort by
+  sortOrder?: 'asc' | 'desc' // sort direction
 }

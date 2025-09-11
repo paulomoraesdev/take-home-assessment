@@ -36,18 +36,20 @@ export class ContactRepository {
    * @param {number} page - Current page (defaults to 1)
    * @param {number} limit - Page size (defaults to 10)
    * @param {Prisma.ContactWhereInput} [filter] - Dynamic filter criteria
+   * @param {Prisma.ContactOrderByWithRelationInput} [orderBy] - Sorting criteria (defaults to createdAt desc)
    * @returns {Promise<Contact[]>} List of contacts matching the criteria
    */
   async getAll(
     page: number,
     limit: number,
-    filter: Prisma.ContactWhereInput = { archivedAt: null, deletedAt: null }
+    filter: Prisma.ContactWhereInput = { archivedAt: null, deletedAt: null },
+    orderBy: Prisma.ContactOrderByWithRelationInput = { createdAt: 'desc' }
   ): Promise<Contact[]> {
     return this.prisma.contact.findMany({
       where: filter,
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
     });
   }
 

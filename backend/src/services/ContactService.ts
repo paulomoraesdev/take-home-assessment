@@ -40,10 +40,12 @@ export class ContactService {
    * @param {number} [limit=10] - Page size
    * @param {boolean} [archived=false] - Whether to list archived instead of active contacts
    * @param {string} [search] - Search term to filter contacts by name (case-insensitive, partial match)
+   * @param {string} [sortBy] - Field to sort by (name, lastContactAt, createdAt, updatedAt)
+   * @param {string} [sortOrder] - Sort direction (asc, desc)
    * @returns {Promise<{ data: Contact[], meta: { total: number, page: number, limit: number, totalPages: number } }>}
    * A paginated response with contacts and metadata
    */
-  async getAll(page = 1, limit = 10, archived = false, search?: string) {
+  async getAll(page = 1, limit = 10, archived = false, search?: string, sortBy = 'createdAt', sortOrder: 'asc' | 'desc' = 'desc') {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -53,8 +55,13 @@ export class ContactService {
       ...( search ? { name : { contains: search, mode: 'insensitive' } } : {} )
     };
 
+    // Build orderBy object based on sortBy and sortOrder
+    const validSortFields = ['name', 'lastContactAt', 'createdAt', 'updatedAt'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const orderBy: Prisma.ContactOrderByWithRelationInput = { [sortField]: sortOrder };
+
     const [data, total] = await Promise.all([
-      this.repository.getAll(page, limit, filter),
+      this.repository.getAll(page, limit, filter, orderBy),
       this.repository.count(filter),
     ]);
 

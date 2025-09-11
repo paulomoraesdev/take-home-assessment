@@ -191,9 +191,8 @@ export const useContactsStore = defineStore('contacts', () => {
         limit: limit.value,
         archived: showArchived.value,
         s: search.value || undefined,
-        // TODO: Add sorting parameters when backend supports it
-        // sortField: sortField.value,
-        // sortOrder: sortOrder.value,
+        sortBy: sortField.value,
+        sortOrder: sortDirection.value,
         ...params
       }
       
@@ -410,19 +409,23 @@ export const useContactsStore = defineStore('contacts', () => {
   }
 
   /**
-   * Update sort field and reset pagination
+   * Update sort field and refresh data
    */
-  function updateSortField(field: SortField) {
+  async function updateSortField(field: SortField) {
+    if (contentLoading.value) return
     sortField.value = field
     currentPage.value = 1
+    await fetchContacts()
   }
 
   /**
-   * Toggle sort direction
+   * Toggle sort direction and refresh data
    */
-  function toggleSortDirection() {
+  async function toggleSortDirection() {
+    if (contentLoading.value) return
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
     currentPage.value = 1
+    await fetchContacts()
   }
 
   // ===== TABLE UI ACTIONS =====
@@ -442,8 +445,8 @@ export const useContactsStore = defineStore('contacts', () => {
   /**
    * Set table sorting and refresh data
    * 
-   * Updates sort field and direction, then refreshes the contact list.
-   * Currently handles sorting client-side until backend support is added.
+   * Updates sort field and direction, then refreshes the contact list
+   * from the backend with the new sorting parameters.
    * 
    * @param {SortField} field - Field to sort by
    * @param {SortDirection} direction - Sort direction ('asc' or 'desc')

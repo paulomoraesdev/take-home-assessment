@@ -178,7 +178,11 @@ const searchQuery = computed({
 })
 const sortField = computed({
   get: () => contactsStore.sortField,
-  set: (value) => contentLoading.value ? undefined : contactsStore.updateSortField(value)
+  set: (value) => {
+    if (!contentLoading.value) {
+      contactsStore.updateSortField(value)
+    }
+  }
 })
 const sortDirection = computed(() => contactsStore.sortDirection)
 
