@@ -37,6 +37,8 @@ export const useContactsStore = defineStore('contacts', () => {
   
   // Search & Filters
   const search = ref('')
+  const searchInput = ref('') // Immediate input value for display
+  const searchTimeout = ref<number | null>(null)
   const activeTab = ref<ContactTab>('active')
   
   // Sorting
@@ -61,10 +63,10 @@ export const useContactsStore = defineStore('contacts', () => {
   
   // Search computed
   const searchQuery = computed({
-    get: () => search.value,
+    get: () => searchInput.value,
     set: (value: string) => {
-      search.value = value
-      currentPage.value = 1
+      searchInput.value = value
+      debouncedSearch()
     }
   })
   
@@ -83,6 +85,33 @@ export const useContactsStore = defineStore('contacts', () => {
   const isCreateMode = computed(() => isModalOpen.value && !hasCurrentContact.value)
 
   // ===== UTILITY FUNCTIONS =====
+  /**
+   * Debounced search function
+   * 
+   * Implements 1-second delay before triggering search. Clears previous timeout
+   * when new input arrives. Resets to page 1 on search and clears listing when search is empty.
+   */
+  function debouncedSearch() {
+    // Clear existing timeout
+    if (searchTimeout.value) {
+      clearTimeout(searchTimeout.value)
+    }
+    
+    // Set new timeout for 1 second
+    searchTimeout.value = setTimeout(() => {
+      const trimmedInput = searchInput.value.trim()
+      
+      // If search changed, update search value and reset page
+      if (search.value !== trimmedInput) {
+        search.value = trimmedInput
+        currentPage.value = 1
+        
+        // Trigger search with content loading
+        fetchContacts()
+      }
+    }, 1000) as any
+  }
+
   /**
    * Transform date strings to Date objects
    * 
@@ -307,10 +336,29 @@ export const useContactsStore = defineStore('contacts', () => {
   }
 
   /**
-   * Update the search query and reset pagination
+   * Update the search query with debounce
    */
   function updateSearchQuery(query: string) {
     searchQuery.value = query
+  }
+
+  /**
+   * Clear search immediately (no debounce)
+   */
+  function clearSearch() {
+    // Clear timeout to prevent delayed search
+    if (searchTimeout.value) {
+      clearTimeout(searchTimeout.value)
+      searchTimeout.value = null
+    }
+    
+    // Clear both input and search values
+    searchInput.value = ''
+    search.value = ''
+    currentPage.value = 1
+    
+    // Trigger immediate fetch to reset listing
+    fetchContacts()
   }
 
   /**
@@ -508,6 +556,7 @@ export const useContactsStore = defineStore('contacts', () => {
     
     // ===== TABLE UI ACTIONS =====
     updateSearchQuery,
+    clearSearch,
     updateSortField,
     toggleSortDirection,
     setActiveTab,

@@ -170,7 +170,16 @@ const perPage = computed(() => contactsStore.perPage)
 const activeTab = computed(() => contactsStore.activeTab)
 const searchQuery = computed({
   get: () => contactsStore.searchQuery,
-  set: (value) => contentLoading.value ? undefined : contactsStore.updateSearchQuery(value)
+  set: (value) => {
+    if (contentLoading.value) return
+    
+    // If search is being cleared, call clearSearch for immediate reset
+    if (!value || value.trim() === '') {
+      contactsStore.clearSearch()
+    } else {
+      contactsStore.updateSearchQuery(value)
+    }
+  }
 })
 const sortField = computed({
   get: () => contactsStore.sortField,
@@ -230,8 +239,8 @@ const handleDelete = (contact: Contact) => {
 }
 
 // Watch for changes that should trigger data fetch
-// Don't fetch immediately to avoid duplicate fetch with HomeView
-watch([activeTab, searchQuery, sortField, sortDirection, currentPage], () => {
+// Don't watch searchQuery anymore since it's handled by debounce in store
+watch([activeTab, sortField, sortDirection, currentPage], () => {
   contactsStore.fetchContacts()
 })
 </script>
