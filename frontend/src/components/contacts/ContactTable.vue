@@ -13,12 +13,6 @@
           ]"
         >
           Active Contacts
-          <span
-            v-if="activeCount !== undefined"
-            class="ml-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 py-0.5 px-2.5 rounded-full text-xs"
-          >
-            {{ activeCount }}
-          </span>
         </button>
         <button
           @click="handleTabChange('archived')"
@@ -30,12 +24,6 @@
           ]"
         >
           Archived
-          <span
-            v-if="archivedCount !== undefined"
-            class="ml-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 py-0.5 px-2.5 rounded-full text-xs"
-          >
-            {{ archivedCount }}
-          </span>
         </button>
       </nav>
     </div>
