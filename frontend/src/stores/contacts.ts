@@ -32,7 +32,8 @@ export const useContactsStore = defineStore('contacts', () => {
   // Pagination
   const currentPage = ref(1)
   const limit = ref(10)
-  const total = ref(0)
+  const total = ref(0) // Total for current search/filter
+  const totalContacts = ref(0) // Absolute total (active + archived, no search filter)
   const totalPages = ref(0)
   
   // Search & Filters
@@ -52,7 +53,7 @@ export const useContactsStore = defineStore('contacts', () => {
 
   // ===== COMPUTED VALUES =====
   // Contact data computed
-  const hasContacts = computed(() => total.value > 0)
+  const hasContacts = computed(() => totalContacts.value > 0)
   const activeContacts = computed(() => contacts.value.filter(c => !c.archivedAt))
   const archivedContacts = computed(() => contacts.value.filter(c => c.archivedAt))
   const displayedContacts = computed(() => 
@@ -110,6 +111,34 @@ export const useContactsStore = defineStore('contacts', () => {
         fetchContacts()
       }
     }, 1000) as any
+  }
+
+  /**
+   * Update the absolute total contacts count (active + archived)
+   */
+  async function updateTotalContacts() {
+    try {
+      // Fetch active contacts count
+      const activeResponse = await contactRepository.getAll({
+        page: 1,
+        limit: 1,
+        archived: false
+      })
+      
+      // Fetch archived contacts count
+      const archivedResponse = await contactRepository.getAll({
+        page: 1,
+        limit: 1,
+        archived: true
+      })
+      
+      // Sum both totals
+      totalContacts.value = activeResponse.meta.total + archivedResponse.meta.total
+    } catch (err) {
+      console.error('Error updating total contacts:', err)
+      // Fallback to current total if we can't fetch both counts
+      totalContacts.value = total.value
+    }
   }
 
   /**
@@ -176,6 +205,12 @@ export const useContactsStore = defineStore('contacts', () => {
       total.value = response.meta.total
       totalPages.value = response.meta.totalPages
       
+      // Update totalContacts on initial load or when no search/filter is active
+      if (isInitialLoad && !search.value.trim() && activeTab.value === 'active') {
+        // On initial load, also fetch archived count to get accurate total
+        await updateTotalContacts()
+      }
+      
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch contacts'
       console.error('Error fetching contacts:', err)
@@ -222,6 +257,9 @@ export const useContactsStore = defineStore('contacts', () => {
         contacts.value.unshift(createdContact)
         total.value += 1
       }
+      
+      // Update absolute total
+      totalContacts.value += 1
       
       return createdContact
     } catch (err) {
@@ -270,6 +308,9 @@ export const useContactsStore = defineStore('contacts', () => {
         contacts.value.splice(index, 1)
         total.value -= 1
       }
+      
+      // Update absolute total
+      totalContacts.value -= 1
       
       return true
     } catch (err) {
@@ -514,6 +555,7 @@ export const useContactsStore = defineStore('contacts', () => {
     currentPage,
     limit,
     total,
+    totalContacts,
     totalPages,
     search,
     activeTab,

@@ -108,14 +108,11 @@
           </tr>
           
           <!-- No results for search -->
-          <tr v-else-if="isSearching && !hasSearchResults">
+          <tr v-else-if="hasNoSearchResults">
             <td colspan="4" class="px-6 py-12 text-center">
               <div class="text-gray-500 dark:text-gray-400">
-                <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0118 12a8 8 0 01-8 8 8 8 0 01-8-8 8 8 0 018-8c2.321 0 4.438.74 6.156 2H21l-3.5-3.5" />
-                </svg>
                 <p class="text-lg font-medium">No results found</p>
-                <p class="text-sm">No contacts found for "{{ searchQuery }}"</p>
+                <p class="text-sm">No contacts found for "{{ contactsStore.search }}"</p>
               </div>
             </td>
           </tr>
@@ -191,7 +188,8 @@ const sortDirection = computed(() => contactsStore.sortDirection)
 const activeCount = computed(() => contactsStore.activeCount)
 const archivedCount = computed(() => contactsStore.archivedCount)
 const hasSearchResults = computed(() => contacts.value.length > 0)
-const isSearching = computed(() => searchQuery.value.length > 0)
+const isSearching = computed(() => contactsStore.search.length > 0) // Use actual search value, not input
+const hasNoSearchResults = computed(() => isSearching.value && !hasSearchResults.value && !contentLoading.value)
 
 // Event handlers
 const handleTabChange = (tab: ContactTab) => {
