@@ -272,17 +272,26 @@ export const useContactsStore = defineStore('contacts', () => {
   }
 
   async function updateContact(id: string, data: Partial<ContactFormData>): Promise<Contact | null> {
-    loading.value = true
     error.value = null
     
     try {
       const response = await contactRepository.update(id, data)
       const updatedContact = transformContactDates(response.data)
       
-      // Update local state
+      // Check if contact is in current list and still matches current filters
       const index = contacts.value.findIndex(contact => contact.id === id)
       if (index !== -1) {
-        contacts.value[index] = updatedContact
+        const matchesArchiveFilter = activeTab.value === 'active' ? !updatedContact.archivedAt : !!updatedContact.archivedAt
+        const matchesSearchFilter = !search.value || updatedContact.name.toLowerCase().includes(search.value.toLowerCase())
+        
+        if (matchesArchiveFilter && matchesSearchFilter) {
+          // Contact still matches filters, update in place
+          contacts.value[index] = updatedContact
+        } else {
+          // Contact no longer matches current filters, remove from list
+          contacts.value.splice(index, 1)
+          total.value -= 1
+        }
       }
       
       return updatedContact
@@ -290,8 +299,6 @@ export const useContactsStore = defineStore('contacts', () => {
       error.value = err instanceof Error ? err.message : 'Failed to update contact'
       console.error('Error updating contact:', err)
       return null
-    } finally {
-      loading.value = false
     }
   }
 
@@ -474,14 +481,14 @@ export const useContactsStore = defineStore('contacts', () => {
     modalLoading.value = true
     
     // Try to find contact in local state first
-    let contact = contacts.value.find(c => c.id === contactId)
+    let contact: Contact | null = contacts.value.find(c => c.id === contactId) || null
     
     // If not found locally, fetch from API
     if (!contact) {
       contact = await getContactById(contactId)
     }
     
-    currentContact.value = contact || null
+    currentContact.value = contact
     isModalOpen.value = true
     modalLoading.value = false
   }

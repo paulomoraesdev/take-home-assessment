@@ -75,11 +75,10 @@ const handleSubmit = async (formData: ContactFormData) => {
   if (!contact.value) return
   
   try {
-    const success = await contactsStore.updateContact(contact.value.id, formData)
-    if (success) {
-      setTimeout(() => {
-        handleClose()
-      }, 1000)
+    const updatedContact = await contactsStore.updateContact(contact.value.id, formData)
+    if (updatedContact) {
+      // Update the local contact ref with the updated data
+      contact.value = updatedContact
       return { success: true }
     } else {
       return { success: false, error: 'Failed to update contact' }
