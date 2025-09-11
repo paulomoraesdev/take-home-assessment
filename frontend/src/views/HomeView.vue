@@ -16,7 +16,7 @@ const loading = computed(() => contactsStore.loading)
 
 onMounted(() => {
   // Initial fetch to determine if we have contacts
-  contactsStore.fetchContacts()
+  contactsStore.fetchContacts(undefined, true)
 })
 </script>
 

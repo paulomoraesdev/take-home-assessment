@@ -24,7 +24,8 @@ export type { SortField, SortDirection, ContactTab }
 export const useContactsStore = defineStore('contacts', () => {
   // ===== CONTACT DATA STATE =====
   const contacts = ref<Contact[]>([])
-  const loading = ref(false)
+  const loading = ref(false) // General loading for initial table load
+  const contentLoading = ref(false) // Loading for table content (search, filter, pagination)
   const error = ref<string | null>(null)
   
   // ===== TABLE UI STATE =====
@@ -115,10 +116,15 @@ export const useContactsStore = defineStore('contacts', () => {
    * @param {number} [params.limit] - Number of items per page
    * @param {boolean} [params.archived] - Include archived contacts
    * @param {string} [params.s] - Search query string
+   * @param {boolean} [isInitialLoad=false] - Whether this is the initial table load
    * @returns {Promise<void>} Promise that resolves when contacts are loaded
    */
-  async function fetchContacts(params?: ContactsQueryParams) {
-    loading.value = true
+  async function fetchContacts(params?: ContactsQueryParams, isInitialLoad = false) {
+    if (isInitialLoad) {
+      loading.value = true
+    } else {
+      contentLoading.value = true
+    }
     error.value = null
     
     try {
@@ -146,6 +152,7 @@ export const useContactsStore = defineStore('contacts', () => {
       console.error('Error fetching contacts:', err)
     } finally {
       loading.value = false
+      contentLoading.value = false
     }
   }
 
@@ -346,6 +353,7 @@ export const useContactsStore = defineStore('contacts', () => {
    * @param {SortDirection} direction - Sort direction ('asc' or 'desc')
    */
   async function setSorting(field: SortField, direction: SortDirection) {
+    if (contentLoading.value) return
     sortField.value = field
     sortDirection.value = direction
     currentPage.value = 1
@@ -384,7 +392,7 @@ export const useContactsStore = defineStore('contacts', () => {
       contact = await getContactById(contactId)
     }
     
-    currentContact.value = contact
+    currentContact.value = contact || null
     isModalOpen.value = true
     modalLoading.value = false
   }
@@ -422,21 +430,21 @@ export const useContactsStore = defineStore('contacts', () => {
 
   // ===== PAGINATION ACTIONS =====
   function nextPage() {
-    if (hasMorePages.value) {
+    if (hasMorePages.value && !contentLoading.value) {
       currentPage.value += 1
       fetchContacts()
     }
   }
 
   function previousPage() {
-    if (!isFirstPage.value) {
+    if (!isFirstPage.value && !contentLoading.value) {
       currentPage.value -= 1
       fetchContacts()
     }
   }
 
   function goToPage(page: number) {
-    if (page >= 1 && page <= totalPages.value) {
+    if (page >= 1 && page <= totalPages.value && !contentLoading.value) {
       currentPage.value = page
       fetchContacts()
     }
@@ -451,6 +459,7 @@ export const useContactsStore = defineStore('contacts', () => {
     // ===== CONTACT DATA =====
     contacts,
     loading,
+    contentLoading,
     error,
     
     // ===== TABLE STATE =====

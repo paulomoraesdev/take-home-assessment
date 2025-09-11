@@ -5,22 +5,26 @@
       <nav class="-mb-px flex space-x-8">
         <button
           @click="handleTabChange('active')"
+          :disabled="contentLoading"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors',
             activeTab === 'active'
               ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-500'
+              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-500',
+            contentLoading && 'opacity-50 cursor-not-allowed'
           ]"
         >
           Active Contacts
         </button>
         <button
           @click="handleTabChange('archived')"
+          :disabled="contentLoading"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors',
             activeTab === 'archived'
               ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-500'
+              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-500',
+            contentLoading && 'opacity-50 cursor-not-allowed'
           ]"
         >
           Archived
@@ -41,7 +45,11 @@
           v-model="searchQuery"
           type="text"
           placeholder="Search contacts..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+          :disabled="contentLoading"
+          :class="[
+            'w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400',
+            contentLoading && 'opacity-50 cursor-not-allowed'
+          ]"
         />
       </div>
 
@@ -53,14 +61,22 @@
         <select
           id="sort"
           v-model="sortField"
-          class="border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          :disabled="contentLoading"
+          :class="[
+            'border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            contentLoading && 'opacity-50 cursor-not-allowed'
+          ]"
         >
           <option value="name">Name</option>
           <option value="lastContactAt">Last Contact</option>
         </select>
         <button
           @click="toggleSortDirection"
-          class="p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          :disabled="contentLoading"
+          :class="[
+            'p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500',
+            contentLoading && 'opacity-50 cursor-not-allowed'
+          ]"
           :title="sortDirection === 'asc' ? 'Sort descending' : 'Sort ascending'"
         >
           <svg v-if="sortDirection === 'asc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,8 +95,8 @@
         <ContactTableHeader />
         
         <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-600">
-          <!-- Loading state -->
-          <tr v-if="loading">
+          <!-- Content loading state -->
+          <tr v-if="contentLoading">
             <td colspan="4" class="px-6 py-12 text-center">
               <div class="flex justify-center">
                 <svg class="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
@@ -92,7 +108,7 @@
           </tr>
           
           <!-- No results for search -->
-          <tr v-else-if="isSearching && !hasSearchResults && !loading">
+          <tr v-else-if="isSearching && !hasSearchResults">
             <td colspan="4" class="px-6 py-12 text-center">
               <div class="text-gray-500 dark:text-gray-400">
                 <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,6 +141,7 @@
       :total-pages="totalPages"
       :total="total"
       :per-page="perPage"
+      :disabled="contentLoading"
       @previous="handlePreviousPage"
       @next="handleNextPage"
       @goto="handleGotoPage"
@@ -145,6 +162,7 @@ const contactsStore = useContactsStore()
 // Computed properties from store
 const contacts = computed(() => contactsStore.contacts)
 const loading = computed(() => contactsStore.loading)
+const contentLoading = computed(() => contactsStore.contentLoading)
 const total = computed(() => contactsStore.total)
 const currentPage = computed(() => contactsStore.currentPage)
 const totalPages = computed(() => contactsStore.totalPages)
@@ -152,11 +170,11 @@ const perPage = computed(() => contactsStore.perPage)
 const activeTab = computed(() => contactsStore.activeTab)
 const searchQuery = computed({
   get: () => contactsStore.searchQuery,
-  set: (value) => contactsStore.updateSearchQuery(value)
+  set: (value) => contentLoading.value ? undefined : contactsStore.updateSearchQuery(value)
 })
 const sortField = computed({
   get: () => contactsStore.sortField,
-  set: (value) => contactsStore.updateSortField(value)
+  set: (value) => contentLoading.value ? undefined : contactsStore.updateSortField(value)
 })
 const sortDirection = computed(() => contactsStore.sortDirection)
 
@@ -168,23 +186,33 @@ const isSearching = computed(() => searchQuery.value.length > 0)
 
 // Event handlers
 const handleTabChange = (tab: ContactTab) => {
-  contactsStore.setActiveTab(tab)
+  if (!contentLoading.value) {
+    contactsStore.setActiveTab(tab)
+  }
 }
 
 const toggleSortDirection = () => {
-  contactsStore.toggleSortDirection()
+  if (!contentLoading.value) {
+    contactsStore.toggleSortDirection()
+  }
 }
 
 const handlePreviousPage = () => {
-  contactsStore.previousPage()
+  if (!contentLoading.value) {
+    contactsStore.previousPage()
+  }
 }
 
 const handleNextPage = () => {
-  contactsStore.nextPage()
+  if (!contentLoading.value) {
+    contactsStore.nextPage()
+  }
 }
 
 const handleGotoPage = (page: number) => {
-  contactsStore.goToPage(page)
+  if (!contentLoading.value) {
+    contactsStore.goToPage(page)
+  }
 }
 
 const handleArchive = (contact: Contact) => {
