@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-slate-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-slate-600 sm:px-6">
+  <div class="py-3 flex items-center justify-between">
     <!-- Mobile pagination -->
     <div class="flex-1 flex justify-between sm:hidden">
       <button
@@ -22,13 +22,13 @@
     <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
       <!-- Results info -->
       <div>
-        <p class="text-sm text-gray-700 dark:text-gray-300">
+        <p class="text-lg text-gray-700 dark:text-gray-300 font-questrial">
           Showing
-          <span class="font-medium">{{ startItem }}</span>
+          <span class="font-bold">{{ startItem }}</span>
           to
-          <span class="font-medium">{{ endItem }}</span>
+          <span class="font-bold">{{ endItem }}</span>
           of
-          <span class="font-medium">{{ total }}</span>
+          <span class="font-bold">{{ total }}</span>
           results
         </p>
       </div>
