@@ -301,6 +301,13 @@ const handleSubmit = async () => {
     
     if (result.success) {
       saveState.value = 'success'
+      
+      // For editing mode, return to idle state after 3 seconds
+      if (isEditing.value) {
+        setTimeout(() => {
+          saveState.value = 'idle'
+        }, 3000)
+      }
     } else {
       saveState.value = 'error'
       console.error('Submit failed:', result.error)
@@ -316,4 +323,33 @@ const handleSubmit = async () => {
     }, 2000)
   }
 }
+
+// Method to clear form (exposed to parent)
+const clearForm = () => {
+  // Reset form fields
+  form.name = ''
+  form.profilePicture = ''
+  form.lastContactAt = new Date()
+  
+  // Reset image state
+  originalProfilePicture.value = ''
+  hasNewImage.value = false
+  
+  // Reset cropper state
+  selectedImageForCrop.value = ''
+  showCropper.value = false
+  
+  // Reset save state
+  saveState.value = 'idle'
+  
+  // Clear file input if it exists
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''
+  }
+}
+
+// Expose clearForm method to parent component
+defineExpose({
+  clearForm
+})
 </script>

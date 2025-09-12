@@ -13,6 +13,7 @@
     
     <div id="contact-description">
       <ContactForm 
+        ref="contactFormRef"
         @submit="handleSubmit"
       />
     </div>
@@ -20,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useContactsStore } from '@/stores/contacts'
 import Modal from '@/components/ui/Modal.vue'
@@ -28,6 +30,7 @@ import type { ContactFormData } from '@/types'
 
 const router = useRouter()
 const contactsStore = useContactsStore()
+const contactFormRef = ref<InstanceType<typeof ContactForm> | null>(null)
 
 const handleClose = () => {
   router.push('/')
@@ -44,9 +47,10 @@ const handleSubmit = async (formData: Partial<ContactFormData>) => {
   const success = await contactsStore.createContact(completeFormData)
   
   if (success) {
-    setTimeout(() => {
-      handleClose()
-    }, 1000)
+    // Instead of closing modal, clear the form for new entry
+    if (contactFormRef.value) {
+      contactFormRef.value.clearForm()
+    }
   }
 }
 </script>

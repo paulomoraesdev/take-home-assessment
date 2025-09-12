@@ -147,7 +147,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { useContactsStore } from '@/stores/contacts'
-import ContactTableHeader from './ContactTableHeader.vue'
 import ContactTableRow from './ContactTableRow.vue'
 import ContactTablePagination from './ContactTablePagination.vue'
 import type { Contact, ContactTab } from '@/types'
