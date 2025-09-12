@@ -2,7 +2,7 @@
   <form @submit.prevent="handleSubmit" class="space-y-4">
     <div>
       <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-        Name
+        Name <span class="text-red-800">*</span>
       </label>
       <input
         id="name"
@@ -16,7 +16,7 @@
     
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">
-        Profile Picture
+        Profile Picture <span class="text-red-800">*</span>
       </label>
       
       <!-- File input (hidden) -->
@@ -72,7 +72,7 @@
     
     <div>
       <label for="lastContactAt" class="block text-sm font-medium text-gray-700 mb-1">
-        Last Contact Date
+        Last Contact Date <span class="text-red-800">*</span>
       </label>
       <input
         id="lastContactAt"
@@ -89,6 +89,7 @@
       <SaveButton 
         type="submit" 
         :state="saveState"
+        :disabled="!isFormValid"
       />
     </div>
   </form>
@@ -99,6 +100,7 @@ import { reactive, ref, computed, onMounted, watch } from 'vue'
 import { useContactsStore } from '@/stores/contacts'
 import SaveButton from '@/components/ui/SaveButton.vue'
 import ImageCropper from '@/components/ui/ImageCropper.vue'
+import { validateCreateContactForm, validateUpdateContactForm } from '@/validations/contactForm.schema'
 import type { Contact, ContactFormData } from '@/types'
 import type { SaveState } from '@/components/ui/SaveButton.vue'
 
@@ -130,6 +132,34 @@ const showCropper = ref(false)
 const selectedImageForCrop = ref('')
 
 const isEditing = computed(() => !!props.contact)
+
+// Form validation
+const isFormValid = computed(() => {
+  if (isEditing.value) {
+    // For editing, we need at least name and lastContactAt to be valid
+    // ProfilePicture is optional unless hasNewImage is true
+    const hasValidName = form.name.trim().length > 0
+    const hasValidDate = form.lastContactAt instanceof Date && !isNaN(form.lastContactAt.getTime())
+    
+    let hasValidImage = true
+    if (hasNewImage.value && form.profilePicture) {
+      // Only validate image if user uploaded a new one
+      const imageResult = validateUpdateContactForm({ profilePicture: form.profilePicture })
+      hasValidImage = imageResult.success
+    }
+    
+    return hasValidName && hasValidDate && hasValidImage
+  } else {
+    // For creation, all fields are required
+    const formData = {
+      name: form.name,
+      profilePicture: form.profilePicture,
+      lastContactAt: form.lastContactAt
+    }
+    const result = validateCreateContactForm(formData)
+    return result.success
+  }
+})
 
 // Helper to convert Date to MM/DD/YYYY input format
 const formatDateForInput = (date: Date | undefined): string => {

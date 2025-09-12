@@ -3,7 +3,7 @@
     v-bind="$attrs"
     :small="small"
     :loading="state === 'saving'"
-    :disabled="state === 'saving'"
+    :disabled="disabled || state === 'saving'"
     :class="stateClasses"
     @click="handleClick"
   >
@@ -20,6 +20,7 @@ export type SaveState = 'idle' | 'saving' | 'success' | 'error'
 interface Props {
   small?: boolean
   state?: SaveState
+  disabled?: boolean
   saveText?: string
   savingText?: string
   successText?: string
@@ -33,6 +34,7 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   small: false,
   state: 'idle',
+  disabled: false,
   saveText: 'Save',
   savingText: 'Saving...',
   successText: 'Success!',
@@ -62,7 +64,7 @@ const stateClasses = computed(() => {
 })
 
 const handleClick = () => {
-  if (props.state !== 'saving') {
+  if (!props.disabled && props.state !== 'saving') {
     emit('click')
   }
 }
