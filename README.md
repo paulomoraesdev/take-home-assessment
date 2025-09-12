@@ -25,6 +25,8 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 
 ## Environment Variables
 
+**IMPORTANT!: I sent my own TOKENS via email, if you want to avoid setting up a new Supabase instance or adding new databases, you can use it and avoid running the migrations**
+
 ### Backend (`backend/.env`)
 - `API_PORT` – server port.  
 - `CORS_ORIGIN` – allowed origin for CORS.  
@@ -62,7 +64,7 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 4. **Prepare the database**
    ```bash
    cd backend
-   npx prisma migrate dev
+   npx prisma migrate dev // YOU NEED TO RUN THE MIGRATION JUST IF YOU DECIDE TO USE A FRESH DATABASE
    ```
 
 5. **Run in development mode**
