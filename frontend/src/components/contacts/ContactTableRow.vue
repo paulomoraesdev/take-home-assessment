@@ -1,5 +1,5 @@
 <template>
-  <tr class="max-w-full bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+  <tr class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
     <!-- Photo -->
     <td class="px-6 py-4 whitespace-nowrap">
       <div class="h-10 w-10">
