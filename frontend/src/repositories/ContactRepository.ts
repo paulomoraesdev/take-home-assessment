@@ -74,7 +74,11 @@ export class ContactRepository {
     // Transform Date objects to ISO strings for API compatibility
     const transformedData = {
       ...data,
-      ...(data.lastContactAt && { lastContactAt: data.lastContactAt.toISOString() })
+      ...(data.lastContactAt && { 
+        lastContactAt: data.lastContactAt instanceof Date 
+          ? data.lastContactAt.toISOString() 
+          : new Date(data.lastContactAt).toISOString() 
+      })
     }
     
     return httpClient.post<ApiResponse<Contact>>(this.basePath, transformedData)
@@ -97,7 +101,11 @@ export class ContactRepository {
     // Transform Date objects to ISO strings for API compatibility
     const transformedData = {
       ...data,
-      ...(data.lastContactAt && { lastContactAt: data.lastContactAt.toISOString() })
+      ...(data.lastContactAt && { 
+        lastContactAt: data.lastContactAt instanceof Date 
+          ? data.lastContactAt.toISOString() 
+          : new Date(data.lastContactAt).toISOString() 
+      })
     }
     
     return httpClient.put<ApiResponse<Contact>>(`${this.basePath}/${id}`, transformedData)

@@ -18,42 +18,16 @@
       />
     </div>
 
-    <!-- Table -->
-    <div class="bg-white dark:bg-slate-800 shadow overflow-hidden rounded-lg">
-      <table class="w-full divide-y divide-gray-200 dark:divide-slate-600">
-        <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-600">
-          <!-- Content loading state -->
-          <tr v-if="contentLoading">
-            <td colspan="4" class="px-6 py-12 text-center">
-              <div class="flex justify-center">
-                <Spinner />
-              </div>
-            </td>
-          </tr>
-          
-          <!-- No results for search -->
-          <tr v-else-if="hasNoSearchResults">
-            <td colspan="4" class="px-6 py-12 text-center">
-              <div class="text-gray-500 dark:text-gray-400">
-                <p class="text-lg font-medium">No results found</p>
-                <p class="text-sm">No contacts found for "{{ contactsStore.search }}"</p>
-              </div>
-            </td>
-          </tr>
-          
-          <!-- Contact rows -->
-          <ContactTableRow
-            v-else
-            v-for="contact in contacts"
-            :key="contact.id"
-            :contact="contact"
-            @archive="handleArchive"
-            @restore="handleRestore"
-            @delete="handleDelete"
-          />
-        </tbody>
-      </table>
-    </div>
+    <!-- Responsive Contact Grid -->
+    <ContactGrid
+      :contacts="contacts"
+      :content-loading="contentLoading"
+      :search-query="contactsStore.search"
+      :has-no-search-results="hasNoSearchResults"
+      @archive="handleArchive"
+      @restore="handleRestore"
+      @delete="handleDelete"
+    />
 
     <!-- Pagination -->
     <ContactTablePagination
@@ -73,12 +47,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useContactsStore } from '@/stores/contacts'
-import ContactTableRow from './ContactTableRow.vue'
+import ContactGrid from './ContactGrid.vue'
 import ContactTablePagination from './ContactTablePagination.vue'
 import ContactTableTabs from './ContactTableTabs.vue'
 import ContactTableSearchBar from './ContactTableSearchBar.vue'
 import ContactTableSortControls from './ContactTableSortControls.vue'
-import Spinner from '@/components/ui/Spinner.vue'
 import { useContactTableFilters } from '@/composables/useContactTableFilters'
 import type { Contact } from '@/types'
 

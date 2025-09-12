@@ -56,7 +56,7 @@
               position="middle"
               :disabled="disabled"
               :label="page"
-              @click="$emit('goto', page)"
+              @click="$emit('goto', Number(page))"
             />
             <Pill
               v-else

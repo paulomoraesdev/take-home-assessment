@@ -27,8 +27,10 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
       let lastContactDate: Date
       if (typeof form.lastContactAt === 'string') {
         lastContactDate = new Date(form.lastContactAt)
-      } else {
+      } else if (form.lastContactAt) {
         lastContactDate = form.lastContactAt
+      } else {
+        lastContactDate = new Date()
       }
       const hasValidDate = lastContactDate instanceof Date && !isNaN(lastContactDate.getTime())
 
@@ -44,8 +46,10 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
       let lastContactDate: Date
       if (typeof form.lastContactAt === 'string') {
         lastContactDate = new Date(form.lastContactAt)
-      } else {
+      } else if (form.lastContactAt) {
         lastContactDate = form.lastContactAt
+      } else {
+        lastContactDate = new Date()
       }
 
       const formData = {
@@ -100,8 +104,10 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
       let lastContactDate: Date
       if (typeof form.lastContactAt === 'string') {
         lastContactDate = new Date(form.lastContactAt)
-      } else {
+      } else if (form.lastContactAt) {
         lastContactDate = form.lastContactAt
+      } else {
+        lastContactDate = new Date()
       }
 
       const formData: Partial<ContactFormData> = {

@@ -18,7 +18,7 @@
       <label class="block text-sm font-medium text-slate-800 dark:text-gray-200 mb-1">
         Profile Picture <span class="text-red-800">*</span>
       </label>
-      <ImageUploader v-model="form.profilePicture" @new-image="setHasNewImage" />
+      <ImageUploader :model-value="form.profilePicture || ''" @update:model-value="form.profilePicture = $event" @new-image="setHasNewImage" />
     </div>
     
     <div>
