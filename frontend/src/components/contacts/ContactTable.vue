@@ -91,7 +91,7 @@
 
     <!-- Table -->
     <div class="bg-white dark:bg-slate-800 shadow overflow-hidden rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-600">
+      <table class="max-w-full divide-y divide-gray-200 dark:divide-slate-600">
         <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-600">
           <!-- Content loading state -->
           <tr v-if="contentLoading">

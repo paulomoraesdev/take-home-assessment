@@ -14,6 +14,7 @@
       flex
       flex-col
       gap-10
+      w-full
     "
   >
     <slot />
