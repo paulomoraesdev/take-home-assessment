@@ -6,9 +6,10 @@
     aria-describedby="contact-edit-description"
   >
     <template #header>
-      <h2 id="contact-edit-title" class="text-xl font-semibold text-gray-900">
-        Edit Contact
-      </h2>
+      <ModalTitle 
+        id="contact-edit-title" 
+        title="Edit Contact" 
+      />
     </template>
     
     <div id="contact-edit-description">
@@ -34,6 +35,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useContactsStore } from '@/stores/contacts'
 import Modal from '@/components/ui/Modal.vue'
+import ModalTitle from '@/components/ui/ModalTitle.vue'
 import ContactForm from '@/components/forms/ContactForm.vue'
 import ModalSpinner from '@/components/ui/ModalSpinner.vue'
 import type { Contact, ContactFormData } from '@/types'

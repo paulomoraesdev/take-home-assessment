@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   saveText: 'Save',
   savingText: 'Saving...',
-  successText: 'Success!',
+  successText: 'Saved!',
   errorText: 'Error'
 })
 

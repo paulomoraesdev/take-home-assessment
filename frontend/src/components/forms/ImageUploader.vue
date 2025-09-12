@@ -13,7 +13,7 @@
     <div class="space-y-3">
       <div
         v-if="!modelValue"
-        class="flex items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+        class="flex items-center justify-center w-full h-32 cursor-pointer bg-gray-200 dark:bg-slate-900 rounded-md focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
         @click="triggerFileInput"
       >
         <div class="text-center">

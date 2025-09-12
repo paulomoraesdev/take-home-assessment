@@ -1,9 +1,10 @@
 <template>
   <Modal :show="show" @close="handleCancel" aria-labelledby="image-crop-title">
     <template #header>
-      <h2 id="image-crop-title" class="text-xl font-semibold text-gray-900">
-        Crop Profile Picture
-      </h2>
+      <ModalTitle 
+        id="image-crop-title" 
+        title="Crop Profile Picture" 
+      />
     </template>
     
     <div class="space-y-4">
@@ -63,6 +64,7 @@
 import { ref, computed, watch } from 'vue'
 import { Cropper, CircleStencil } from 'vue-advanced-cropper'
 import Modal from './Modal.vue'
+import ModalTitle from './ModalTitle.vue'
 import 'vue-advanced-cropper/dist/style.css'
 
 interface Props {

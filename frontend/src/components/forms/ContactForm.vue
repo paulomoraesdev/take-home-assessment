@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-4">
     <div>
-      <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+      <label for="name" class="block text-sm font-medium text-slate-800 dark:text-gray-200 mb-1">
         Name <span class="text-red-800">*</span>
       </label>
       <input
@@ -9,20 +9,20 @@
         v-model="form.name"
         type="text"
         required
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        class="w-full px-3 py-2 border-0 bg-gray-200 dark:bg-slate-900 rounded-md focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
         placeholder="Enter contact name"
       />
     </div>
     
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">
+      <label class="block text-sm font-medium text-slate-800 dark:text-gray-200 mb-1">
         Profile Picture <span class="text-red-800">*</span>
       </label>
       <ImageUploader v-model="form.profilePicture" @new-image="setHasNewImage" />
     </div>
     
     <div>
-      <label for="lastContactAt" class="block text-sm font-medium text-gray-700 mb-1">
+      <label for="lastContactAt" class="block text-sm font-medium text-slate-800 dark:text-gray-200 mb-1">
         Last Contact Date <span class="text-red-800">*</span>
       </label>
       <VueDatePicker
@@ -33,7 +33,7 @@
         :required="true"
         :clearable="false"
         class="w-full"
-        input-class-name="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        input-class-name="w-full px-3 py-2 bg-gray-200 dark:bg-slate-900 rounded-md focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
       />
     </div>
     
@@ -64,7 +64,6 @@ const emit = defineEmits<Emits>()
 
 const { form, saveState, isFormValid, handleSubmit, clearForm, setHasNewImage } = useContactForm(props, emit)
 
-// Expose clearForm method to parent component
 defineExpose({
   clearForm
 })

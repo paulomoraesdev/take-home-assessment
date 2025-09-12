@@ -6,9 +6,10 @@
     aria-describedby="contact-description"
   >
     <template #header>
-      <h2 id="contact-title" class="text-xl font-semibold text-gray-900">
-        Create a new contact
-      </h2>
+      <ModalTitle 
+        id="contact-title" 
+        title="Create a new contact" 
+      />
     </template>
     
     <div id="contact-description">
@@ -25,6 +26,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useContactsStore } from '@/stores/contacts'
 import Modal from '@/components/ui/Modal.vue'
+import ModalTitle from '@/components/ui/ModalTitle.vue'
 import ContactForm from '@/components/forms/ContactForm.vue'
 import type { ContactFormData } from '@/types'
 
