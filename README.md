@@ -37,7 +37,7 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 
 ### Frontend (`frontend/.env`)
 - `VITE_API_BASE_URL` – base URL of the API.  
-- `VITE_API_TOKEN` – token sent in requests.  
+- `VITE_API_TOKEN` – token sent in requests. Must be the same value as API_TOKEN 
 
 ## How to Run
 
