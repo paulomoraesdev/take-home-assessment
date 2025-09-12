@@ -5,8 +5,6 @@ import { buildApp } from '../src/app.js';
 let fastifyAppPromise: ReturnType<typeof buildApp> | null = null;
 
 export const config = {
-  // Let Fastify handle the body parsing (JSON/multipart/etc.)
-  api: { bodyParser: false },
   runtime: 'nodejs20.x'
 } as const;
 
@@ -27,4 +25,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }
-
