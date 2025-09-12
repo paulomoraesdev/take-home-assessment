@@ -93,6 +93,7 @@ import EditIcon from '@/components/icons/EditIcon.vue'
 import ArchiveIcon from '@/components/icons/ArchiveIcon.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import RestoreIcon from '@/components/icons/RestoreIcon.vue'
+import { formatDateToMonthDayYear } from '@/utils/dateFormat'
 
 interface Props {
   contact: Contact
@@ -108,10 +109,6 @@ defineProps<Props>()
 defineEmits<Emits>()
 
 const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
-    month: '2-digit',
-    day: '2-digit', 
-    year: 'numeric'
-  }).format(new Date(date))
+  return formatDateToMonthDayYear(date)
 }
 </script>

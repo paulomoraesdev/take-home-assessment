@@ -25,15 +25,13 @@
       <label for="lastContactAt" class="block text-sm font-medium text-slate-800 dark:text-gray-200 mb-1">
         Last Contact Date <span class="text-red-800">*</span>
       </label>
-      <VueDatePicker
+      <input
+        id="lastContactAt"
         v-model="form.lastContactAt"
-        format="MM/dd/yyyy"
-        :enable-time-picker="false"
-        placeholder="MM/DD/YYYY"
-        :required="true"
-        :clearable="false"
-        class="w-full"
-        input-class-name="w-full px-3 py-2 bg-gray-200 dark:bg-slate-900 rounded-md focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+        type="date"
+        :max="new Date().toISOString().split('T')[0]"
+        required
+        class="w-full px-3 py-2 border-0 bg-gray-200 dark:bg-slate-900 rounded-md focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 date-input"
       />
     </div>
     
@@ -48,8 +46,6 @@ import ImageUploader from '@/components/forms/ImageUploader.vue'
 import SaveButton from '@/components/ui/SaveButton.vue'
 import { useContactForm } from '@/composables/useContactForm'
 import type { Contact, ContactFormData } from '@/types'
-import VueDatePicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
 
 interface Props {
   contact?: Contact
@@ -68,3 +64,36 @@ defineExpose({
   clearForm
 })
 </script>
+
+<style scoped>
+/* Estilização customizada do input date */
+.date-input {
+  /* Webkit/Chromium - estiliza o ícone do calendário */
+  color-scheme: light dark;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.5); /* Torna o ícone mais escuro */
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Dark mode - inverte a cor do ícone */
+.dark .date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) brightness(1.2); /* Torna o ícone mais claro no modo escuro */
+}
+
+/* Firefox - limitado, mas podemos ajustar a aparência geral */
+@-moz-document url-prefix() {
+  .date-input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+  }
+  
+  .dark .date-input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23ccc" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>');
+  }
+}
+</style>

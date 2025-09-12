@@ -10,7 +10,7 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
   const form = reactive<ContactFormData>({
     name: '',
     profilePicture: '',
-    lastContactAt: new Date()
+    lastContactAt: new Date().toISOString().split('T')[0] // Format: YYYY-MM-DD
   })
 
   const saveState = ref<SaveState>('idle')
@@ -22,7 +22,15 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
   const isFormValid = computed(() => {
     if (isEditing.value) {
       const hasValidName = form.name.trim().length > 0
-      const hasValidDate = form.lastContactAt instanceof Date && !isNaN(form.lastContactAt.getTime())
+      
+      // Convert string date to Date object for validation
+      let lastContactDate: Date
+      if (typeof form.lastContactAt === 'string') {
+        lastContactDate = new Date(form.lastContactAt)
+      } else {
+        lastContactDate = form.lastContactAt
+      }
+      const hasValidDate = lastContactDate instanceof Date && !isNaN(lastContactDate.getTime())
 
       let hasValidImage = true
       if (hasNewImage.value && form.profilePicture) {
@@ -32,10 +40,18 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
 
       return hasValidName && hasValidDate && hasValidImage
     } else {
+      // Convert string date to Date object for validation
+      let lastContactDate: Date
+      if (typeof form.lastContactAt === 'string') {
+        lastContactDate = new Date(form.lastContactAt)
+      } else {
+        lastContactDate = form.lastContactAt
+      }
+
       const formData = {
         name: form.name,
         profilePicture: form.profilePicture,
-        lastContactAt: form.lastContactAt
+        lastContactAt: lastContactDate
       }
       const result = validateCreateContactForm(formData)
       return result.success
@@ -46,7 +62,12 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
     if (props.contact) {
       form.name = props.contact.name
       form.profilePicture = props.contact.profilePicture
-      form.lastContactAt = props.contact.lastContactAt || new Date()
+      
+      // Convert Date to string format for input type="date"
+      const contactDate = props.contact.lastContactAt || new Date()
+      form.lastContactAt = contactDate instanceof Date 
+        ? contactDate.toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0]
 
       originalProfilePicture.value = props.contact.profilePicture
       hasNewImage.value = false
@@ -75,9 +96,17 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
     saveState.value = 'saving'
 
     try {
+      // Convert string date to Date object if needed
+      let lastContactDate: Date
+      if (typeof form.lastContactAt === 'string') {
+        lastContactDate = new Date(form.lastContactAt)
+      } else {
+        lastContactDate = form.lastContactAt
+      }
+
       const formData: Partial<ContactFormData> = {
         name: form.name,
-        lastContactAt: form.lastContactAt
+        lastContactAt: lastContactDate
       }
 
       if (hasNewImage.value) {
@@ -123,7 +152,7 @@ export function useContactForm(props: { contact?: Contact }, emit: (e: 'submit',
   const clearForm = () => {
     form.name = ''
     form.profilePicture = ''
-    form.lastContactAt = new Date()
+    form.lastContactAt = new Date().toISOString().split('T')[0]
 
     originalProfilePicture.value = ''
     hasNewImage.value = false

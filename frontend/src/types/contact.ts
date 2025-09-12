@@ -14,7 +14,7 @@ export interface Contact {
 export interface ContactFormData {
   name: string
   profilePicture?: string
-  lastContactAt?: Date
+  lastContactAt?: Date | string
   archived?: boolean
 }
 
