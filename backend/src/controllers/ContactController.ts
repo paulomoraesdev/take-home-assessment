@@ -39,17 +39,19 @@ export class ContactController {
    * @returns {Promise<FastifyReply>} Paginated list of contacts
    */
   async index(request: FastifyRequest, reply: FastifyReply) {
-    const { page = 1, limit = 10, archived, s, sortBy, sortOrder } = request.query as {
+    const { page = 1, limit = 10, archived, s, sortBy, sortOrder, includeStats } = request.query as {
       page?: string;
       limit?: string;
       archived?: string;
       s?: string;
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
+      includeStats?: string;
     };
 
     // Parse archived: only undefined or 'false' becomes false, everything else becomes true
     const isArchived = archived !== undefined && archived !== 'false';
+    const isStatusIncluded = includeStats !== undefined && includeStats !== 'false';
 
     const result = await this.service.getAll(
       Number(page), 
@@ -57,7 +59,8 @@ export class ContactController {
       isArchived, 
       s, 
       sortBy || 'createdAt',
-      sortOrder || 'desc'
+      sortOrder || 'desc',
+      isStatusIncluded
     );
     return reply.send(result);
   }

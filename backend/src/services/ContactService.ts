@@ -45,7 +45,15 @@ export class ContactService {
    * @returns {Promise<{ data: Contact[], meta: { total: number, page: number, limit: number, totalPages: number } }>}
    * A paginated response with contacts and metadata
    */
-  async getAll(page = 1, limit = 10, archived = false, search?: string, sortBy = 'createdAt', sortOrder: 'asc' | 'desc' = 'desc') {
+  async getAll(
+      page = 1,
+      limit = 10,
+      archived = false,
+      search?: string,
+      sortBy = 'createdAt',
+      sortOrder: 'asc' | 'desc' = 'desc',
+      isStatusIncluded = false
+    ) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -63,7 +71,11 @@ export class ContactService {
     const [data, total] = await Promise.all([
       this.repository.getAll(page, limit, filter, orderBy),
       this.repository.count(filter),
+      isStatusIncluded && this.repository.getAll(1, 1, { deletedAt: null })
     ]);
+
+    let hasContacts = null;
+    if (isStatusIncluded)  hasContacts = await this.repository.getAll(1, 1, { deletedAt: null })
 
     return {
       data,
@@ -72,6 +84,7 @@ export class ContactService {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
+        hasContacts: hasContacts && !!hasContacts
       },
     };
   }
