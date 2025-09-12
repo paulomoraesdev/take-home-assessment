@@ -41,6 +41,10 @@ I decided to build two separate projects: an API and a WebApp.
   - Some level of over-engineering for a demo project.  
   - Increased setup and maintenance complexity compared to simpler alternatives.
 
+The **API + WebApp split** would not be my default choice for a real project that was guaranteed not to grow beyond initial requirements.  
+In that case, I would probably have chosen a serverless solution.  
+The final decision with some degree of over-engineering was purely to provide more material for evaluation purposes.  
+
 ## Authentication / Authorization  
 
 I implemented an authentication middleware in the API that protects all project routes.  
