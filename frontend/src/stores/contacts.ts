@@ -106,9 +106,6 @@ export const useContactsStore = defineStore('contacts', () => {
       if (search.value !== trimmedInput) {
         search.value = trimmedInput
         currentPage.value = 1
-        
-        // Trigger search with content loading
-        fetchContacts()
       }
     }, 1000) as any
   }
@@ -374,29 +371,24 @@ export const useContactsStore = defineStore('contacts', () => {
     searchInput.value = ''
     search.value = ''
     currentPage.value = 1
-    
-    // Trigger immediate fetch to reset listing
-    fetchContacts()
   }
 
   /**
    * Update sort field and refresh data
    */
-  async function updateSortField(field: SortField) {
+  function updateSortField(field: SortField) {
     if (contentLoading.value) return
     sortField.value = field
     currentPage.value = 1
-    await fetchContacts()
   }
 
   /**
    * Toggle sort direction and refresh data
    */
-  async function toggleSortDirection() {
+  function toggleSortDirection() {
     if (contentLoading.value) return
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
     currentPage.value = 1
-    await fetchContacts()
   }
 
   // ===== TABLE UI ACTIONS =====
@@ -422,12 +414,11 @@ export const useContactsStore = defineStore('contacts', () => {
    * @param {SortField} field - Field to sort by
    * @param {SortDirection} direction - Sort direction ('asc' or 'desc')
    */
-  async function setSorting(field: SortField, direction: SortDirection) {
+  function setSorting(field: SortField, direction: SortDirection) {
     if (contentLoading.value) return
     sortField.value = field
     sortDirection.value = direction
     currentPage.value = 1
-    await fetchContacts()
   }
 
   // ===== MODAL ACTIONS =====
@@ -502,21 +493,18 @@ export const useContactsStore = defineStore('contacts', () => {
   function nextPage() {
     if (hasMorePages.value && !contentLoading.value) {
       currentPage.value += 1
-      fetchContacts()
     }
   }
 
   function previousPage() {
     if (!isFirstPage.value && !contentLoading.value) {
       currentPage.value -= 1
-      fetchContacts()
     }
   }
 
   function goToPage(page: number) {
     if (page >= 1 && page <= totalPages.value && !contentLoading.value) {
       currentPage.value = page
-      fetchContacts()
     }
   }
 

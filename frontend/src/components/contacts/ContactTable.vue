@@ -1,92 +1,21 @@
 <template>
   <div class="space-y-6">
     <!-- Tabs -->
-    <div class="border-b border-gray-200 dark:border-slate-600">
-      <nav class="-mb-px flex space-x-8">
-        <button
-          @click="handleTabChange('active')"
-          :disabled="contentLoading"
-          :class="[
-            'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors',
-            activeTab === 'active'
-              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-500',
-            contentLoading && 'opacity-50 cursor-not-allowed'
-          ]"
-        >
-          Active Contacts
-        </button>
-        <button
-          @click="handleTabChange('archived')"
-          :disabled="contentLoading"
-          :class="[
-            'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors',
-            activeTab === 'archived'
-              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-500',
-            contentLoading && 'opacity-50 cursor-not-allowed'
-          ]"
-        >
-          Archived
-        </button>
-      </nav>
-    </div>
+    <ContactTableTabs
+      :active-tab="activeTab"
+      :disabled="contentLoading"
+      @change="handleTabChange"
+    />
 
     <!-- Controls -->
     <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-      <!-- Search -->
-      <div class="relative flex-1 max-w-md items-center">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search contacts..."
-          :disabled="contentLoading"
-          :class="[
-            'font-sans w-full pl-10 pr-4 py-2 border-0 bg-gray-200 dark:bg-slate-900 rounded-md focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400',
-            contentLoading && 'opacity-50 cursor-not-allowed'
-          ]"
-        />
-      </div>
-
-      <!-- Sort -->
-      <div class="flex items-center gap-2">
-        <label for="sort" class="text-sm font-questrial font-medium text-gray-700 dark:text-gray-300">
-          Sort by:
-        </label>
-        <select
-          id="sort"
-          v-model="sortField"
-          :disabled="contentLoading"
-          :class="[
-            'border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-            contentLoading && 'opacity-50 cursor-not-allowed'
-          ]"
-        >
-          <option value="name">Name</option>
-          <option value="lastContactAt">Last Contact</option>
-        </select>
-        <button
-          @click="toggleSortDirection"
-          :disabled="contentLoading"
-          :class="[
-            'p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500',
-            contentLoading && 'opacity-50 cursor-not-allowed'
-          ]"
-          :title="sortDirection === 'asc' ? 'Sort descending' : 'Sort ascending'"
-        >
-          <svg v-if="sortDirection === 'asc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-          </svg>
-          <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-          </svg>
-        </button>
-      </div>
+      <ContactTableSearchBar v-model="searchQuery" :disabled="contentLoading" />
+      <ContactTableSortControls
+        v-model:field="sortField"
+        :direction="sortDirection"
+        :disabled="contentLoading"
+        @toggle-direction="toggleSortDirection"
+      />
     </div>
 
     <!-- Table -->
@@ -142,85 +71,46 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useContactsStore } from '@/stores/contacts'
 import ContactTableRow from './ContactTableRow.vue'
 import ContactTablePagination from './ContactTablePagination.vue'
+import ContactTableTabs from './ContactTableTabs.vue'
+import ContactTableSearchBar from './ContactTableSearchBar.vue'
+import ContactTableSortControls from './ContactTableSortControls.vue'
 import Spinner from '@/components/ui/Spinner.vue'
-import type { Contact, ContactTab } from '@/types'
+import { useContactTableFilters } from '@/composables/useContactTableFilters'
+import type { Contact } from '@/types'
 
 const contactsStore = useContactsStore()
+
+const {
+  activeTab,
+  searchQuery,
+  sortField,
+  sortDirection,
+  currentPage,
+  totalPages,
+  perPage,
+  total,
+  contentLoading,
+  handleTabChange,
+  toggleSortDirection,
+  handlePreviousPage,
+  handleNextPage,
+  handleGotoPage
+} = useContactTableFilters()
 
 // Computed properties from store
 const contacts = computed(() => contactsStore.contacts)
 const loading = computed(() => contactsStore.loading)
-const contentLoading = computed(() => contactsStore.contentLoading)
-const total = computed(() => contactsStore.total)
-const currentPage = computed(() => contactsStore.currentPage)
-const totalPages = computed(() => contactsStore.totalPages)
-const perPage = computed(() => contactsStore.perPage)
-const activeTab = computed(() => contactsStore.activeTab)
-const searchQuery = computed({
-  get: () => contactsStore.searchQuery,
-  set: (value) => {
-    if (contentLoading.value) return
-    
-    // If search is being cleared, call clearSearch for immediate reset
-    if (!value || value.trim() === '') {
-      contactsStore.clearSearch()
-    } else {
-      contactsStore.updateSearchQuery(value)
-    }
-  }
-})
-const sortField = computed({
-  get: () => contactsStore.sortField,
-  set: (value) => {
-    if (!contentLoading.value) {
-      contactsStore.updateSortField(value)
-    }
-  }
-})
-const sortDirection = computed(() => contactsStore.sortDirection)
 
 // Additional computed properties
-const activeCount = computed(() => contactsStore.activeCount)
-const archivedCount = computed(() => contactsStore.archivedCount)
 const hasSearchResults = computed(() => contacts.value.length > 0)
 const isSearching = computed(() => contactsStore.search.length > 0) // Use actual search value, not input
 const hasNoSearchResults = computed(() => isSearching.value && !hasSearchResults.value && !contentLoading.value)
 
 // Event handlers
-const handleTabChange = (tab: ContactTab) => {
-  if (!contentLoading.value) {
-    contactsStore.setActiveTab(tab)
-  }
-}
-
-const toggleSortDirection = () => {
-  if (!contentLoading.value) {
-    contactsStore.toggleSortDirection()
-  }
-}
-
-const handlePreviousPage = () => {
-  if (!contentLoading.value) {
-    contactsStore.previousPage()
-  }
-}
-
-const handleNextPage = () => {
-  if (!contentLoading.value) {
-    contactsStore.nextPage()
-  }
-}
-
-const handleGotoPage = (page: number) => {
-  if (!contentLoading.value) {
-    contactsStore.goToPage(page)
-  }
-}
-
 const handleArchive = (contact: Contact) => {
   contactsStore.archiveContact(contact.id)
 }
@@ -234,10 +124,4 @@ const handleDelete = (contact: Contact) => {
     contactsStore.deleteContact(contact.id)
   }
 }
-
-// Watch for changes that should trigger data fetch
-// Don't watch searchQuery anymore since it's handled by debounce in store
-watch([activeTab, sortField, sortDirection, currentPage], () => {
-  contactsStore.fetchContacts()
-})
 </script>
