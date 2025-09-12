@@ -80,7 +80,7 @@
           </RouterLink>
           <button
             @click="handleArchive"
-            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
+            class="cursor-pointer flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
             role="menuitem"
           >
             <ArchiveIcon class="mr-3" />
@@ -92,7 +92,7 @@
         <template v-else>
           <button
             @click="handleRestore"
-            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
+            class="cursor-pointer flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
             role="menuitem"
           >
             <RestoreIcon class="mr-3" />
@@ -100,7 +100,7 @@
           </button>
           <button
             @click="handleDelete"
-            class="flex items-center w-full px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            class="cursor-pointer flex items-center w-full px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
             role="menuitem"
           >
             <TrashIcon class="mr-3" />
