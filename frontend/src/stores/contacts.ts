@@ -113,33 +113,6 @@ export const useContactsStore = defineStore('contacts', () => {
     }, 1000) as any
   }
 
-  /**
-   * Update the absolute total contacts count (active + archived)
-   */
-  async function updateTotalContacts() {
-    try {
-      // Fetch active contacts count
-      const activeResponse = await contactRepository.getAll({
-        page: 1,
-        limit: 1,
-        archived: false
-      })
-      
-      // Fetch archived contacts count
-      const archivedResponse = await contactRepository.getAll({
-        page: 1,
-        limit: 1,
-        archived: true
-      })
-      
-      // Sum both totals
-      totalContacts.value = activeResponse.meta.total + archivedResponse.meta.total
-    } catch (err) {
-      console.error('Error updating total contacts:', err)
-      // Fallback to current total if we can't fetch both counts
-      totalContacts.value = total.value
-    }
-  }
 
   /**
    * Transform date strings to Date objects
@@ -174,10 +147,11 @@ export const useContactsStore = defineStore('contacts', () => {
    * @param {number} [params.limit] - Number of items per page
    * @param {boolean} [params.archived] - Include archived contacts
    * @param {string} [params.s] - Search query string
+   * @param {boolean} [params.includeStats] - Include statistics for empty state determination
    * @param {boolean} [isInitialLoad=false] - Whether this is the initial table load
    * @returns {Promise<void>} Promise that resolves when contacts are loaded
    */
-  async function fetchContacts(params?: ContactsQueryParams, isInitialLoad = false) {
+  async function fetchContacts(params?: ContactsQueryParams & { includeStats?: boolean }, isInitialLoad = false) {
     if (isInitialLoad) {
       loading.value = true
     } else {
@@ -204,10 +178,10 @@ export const useContactsStore = defineStore('contacts', () => {
       total.value = response.meta.total
       totalPages.value = response.meta.totalPages
       
-      // Update totalContacts on initial load or when no search/filter is active
-      if (isInitialLoad && !search.value.trim() && activeTab.value === 'active') {
-        // On initial load, also fetch archived count to get accurate total
-        await updateTotalContacts()
+      // Update totalContacts based on hasContacts from backend
+      if (typeof response.meta.hasContacts === 'boolean') {
+        // Backend provided hasContacts - use it to determine if we have any contacts
+        totalContacts.value = response.meta.hasContacts ? 1 : 0
       }
       
     } catch (err) {

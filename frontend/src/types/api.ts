@@ -13,6 +13,7 @@ export interface PaginatedResponse<T> {
     limit: number
     total: number
     totalPages: number
+    hasContacts?: boolean // Optional field when includeStats=true
   }
 }
 
