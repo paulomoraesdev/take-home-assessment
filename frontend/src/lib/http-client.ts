@@ -51,7 +51,6 @@ class HttpClient {
    */
   private buildHeaders(customHeaders?: Record<string, string>): Record<string, string> {
     return {
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.token}`,
       ...customHeaders
     }
@@ -118,11 +117,15 @@ class HttpClient {
 
     const url = `${this.baseUrl}${endpoint}${this.buildQueryString(params)}`
     const headers = this.buildHeaders(customHeaders)
+    // Avoid sending JSON content-type when there's no body (e.g., DELETE without body)
+    if (!body && headers['Content-Type']) {
+      delete (headers as Record<string, string>)['Content-Type']
+    }
 
     const requestOptions: RequestInit = {
       method,
       headers,
-      ...(body && { body: JSON.stringify(body) })
+      ...(body && { body: JSON.stringify(body), headers: { ...headers, 'Content-Type': 'application/json' } })
     }
 
     try {
