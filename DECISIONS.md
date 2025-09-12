@@ -79,4 +79,5 @@ Within the available time, I also aimed to separate components as much as possib
 - Decided to keep everything in a **single store** for simplicity (all logic still relates to contacts, whether displaying or manipulating).  
   Time constraints also influenced this decision 😅.  
 - Implemented **Light/Dark mode** support, but only following the user’s OS settings.  
-  A manual theme toggler was not implemented due to lack of time.  
+  A manual theme toggler was not implemented due to lack of time. 
+- Wrote the code documentations following JSDoc pattern, and tried to make every doc piece as similar as possible with the others in the project.
