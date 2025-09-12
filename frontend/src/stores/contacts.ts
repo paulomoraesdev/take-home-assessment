@@ -244,15 +244,18 @@ export const useContactsStore = defineStore('contacts', () => {
    * @returns {Promise<Contact | null>} Created contact or null if creation failed
    */
   async function createContact(data: ContactFormData): Promise<Contact | null> {
-    loading.value = true
     error.value = null
     
     try {
       const response = await contactRepository.create(data)
       const createdContact = transformContactDates(response.data)
       
-      // Add to local state if we're on the first page
-      if (currentPage.value === 1) {
+      // Check if new contact matches current filters
+      const matchesArchiveFilter = activeTab.value === 'active' ? !createdContact.archivedAt : !!createdContact.archivedAt
+      const matchesSearchFilter = !search.value || createdContact.name.toLowerCase().includes(search.value.toLowerCase())
+      
+      // Add to local state if matches current filters
+      if (matchesArchiveFilter && matchesSearchFilter) {
         contacts.value.unshift(createdContact)
         total.value += 1
       }
@@ -265,8 +268,6 @@ export const useContactsStore = defineStore('contacts', () => {
       error.value = err instanceof Error ? err.message : 'Failed to create contact'
       console.error('Error creating contact:', err)
       return null
-    } finally {
-      loading.value = false
     }
   }
 
