@@ -88,6 +88,7 @@ export class ContactRepository {
    * @returns {Promise<Contact>} The newly created contact
    */
   async create(data: CreateContactDTO): Promise<Contact> {
+    console.log(data, 333)
     return this.prisma.contact.create({ data });
   }
 

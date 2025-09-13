@@ -74,13 +74,13 @@ export class ContactRepository {
     // Transform Date objects to ISO strings for API compatibility
     const transformedData = {
       ...data,
-      ...(data.lastContactAt && { 
-        lastContactAt: data.lastContactAt instanceof Date 
-          ? data.lastContactAt.toISOString() 
-          : new Date(data.lastContactAt).toISOString() 
+      ...(data.lastContactAt && {
+        lastContactAt: data.lastContactAt instanceof Date
+          ? data.lastContactAt.toISOString()
+          : this.formatDateToISOString(data.lastContactAt)
       })
     }
-    
+
     return httpClient.post<ApiResponse<Contact>>(this.basePath, transformedData)
   }
 
@@ -101,14 +101,39 @@ export class ContactRepository {
     // Transform Date objects to ISO strings for API compatibility
     const transformedData = {
       ...data,
-      ...(data.lastContactAt && { 
-        lastContactAt: data.lastContactAt instanceof Date 
-          ? data.lastContactAt.toISOString() 
-          : new Date(data.lastContactAt).toISOString() 
+      ...(data.lastContactAt && {
+        lastContactAt: data.lastContactAt instanceof Date
+          ? data.lastContactAt.toISOString()
+          : this.formatDateToISOString(data.lastContactAt)
       })
     }
-    
+
     return httpClient.put<ApiResponse<Contact>>(`${this.basePath}/${id}`, transformedData)
+  }
+
+  /**
+   * Format a date string to ISO string, preserving the date regardless of timezone
+   *
+   * When we get a date string like "2024-01-15" from an input[type="date"],
+   * we want to preserve that exact date, not convert it to UTC which might
+   * change the date due to timezone offset.
+   *
+   * @private
+   * @method formatDateToISOString
+   * @param {string | Date} dateInput - Date string or Date object
+   * @returns {string} ISO string with the correct date
+   */
+  private formatDateToISOString(dateInput: string | Date): string {
+    if (typeof dateInput === 'string') {
+      // If it's already in YYYY-MM-DD format from date input,
+      // append time as noon in local timezone to avoid UTC conversion issues
+      if (dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return `${dateInput}T12:00:00.000Z`
+      }
+    }
+
+    // Fallback to normal conversion for other cases
+    return new Date(dateInput).toISOString()
   }
 
   /**

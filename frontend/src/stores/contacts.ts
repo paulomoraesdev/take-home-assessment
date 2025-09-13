@@ -113,21 +113,43 @@ export const useContactsStore = defineStore('contacts', () => {
 
   /**
    * Transform date strings to Date objects
-   * 
+   *
    * Converts API response date strings to proper Date objects for frontend use.
-   * Handles null values appropriately for optional date fields.
-   * 
+   * Handles null values appropriately for optional date fields and timezone issues.
+   *
    * @param {any} contact - Contact object with potential string dates
    * @returns {Contact} Contact with proper Date objects
    */
   function transformContactDates(contact: any): Contact {
+    const safeDateParser = (dateInput: string | Date | null): Date | null => {
+      if (!dateInput) return null
+      if (dateInput instanceof Date) return dateInput
+
+      if (typeof dateInput === 'string') {
+        // For YYYY-MM-DD format from date inputs, preserve the date
+        if (dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [year, month, day] = dateInput.split('-').map(Number)
+          return new Date(year, month - 1, day, 12, 0, 0)
+        }
+
+        // For ISO strings ending with T00:00:00.000Z (midnight UTC), extract just the date part
+        if (dateInput.match(/^\d{4}-\d{2}-\d{2}T00:00:00\.000Z$/)) {
+          const dateOnly = dateInput.split('T')[0]
+          const [year, month, day] = dateOnly.split('-').map(Number)
+          return new Date(year, month - 1, day, 12, 0, 0)
+        }
+      }
+
+      return new Date(dateInput)
+    }
+
     return {
       ...contact,
-      lastContactAt: contact.lastContactAt ? new Date(contact.lastContactAt) : new Date(),
-      archivedAt: contact.archivedAt ? new Date(contact.archivedAt) : null,
-      deletedAt: contact.deletedAt ? new Date(contact.deletedAt) : null,
-      createdAt: contact.createdAt ? new Date(contact.createdAt) : new Date(),
-      updatedAt: contact.updatedAt ? new Date(contact.updatedAt) : new Date(),
+      lastContactAt: contact.lastContactAt ? safeDateParser(contact.lastContactAt) : new Date(),
+      archivedAt: contact.archivedAt ? safeDateParser(contact.archivedAt) : null,
+      deletedAt: contact.deletedAt ? safeDateParser(contact.deletedAt) : null,
+      createdAt: contact.createdAt ? safeDateParser(contact.createdAt) : new Date(),
+      updatedAt: contact.updatedAt ? safeDateParser(contact.updatedAt) : new Date(),
     }
   }
 
