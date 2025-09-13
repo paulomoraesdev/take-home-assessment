@@ -1,5 +1,5 @@
 <template>
-  <tr class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-600">
+  <tr class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-600 relative">
     <!-- Photo -->
     <td class="px-6 py-4 whitespace-nowrap">
       <div class="h-10 w-10">
@@ -74,7 +74,7 @@
           <RestoreIcon />
         </button>
         <button
-          @click="$emit('delete', contact)"
+          @click="showDeleteConfirm = true"
           class="cursor-pointer hover:opacity-60"
           title="Delete permanently"
         >
@@ -82,10 +82,20 @@
         </button>
       </template>
     </td>
+
+    <!-- Delete Confirmation Overlay -->
+    <ContactDeleteConfirmationOverlay
+      v-if="showDeleteConfirm"
+      :contact-name="contact.name"
+      :is-deleting="isDeleting"
+      @cancel="handleCancel"
+      @confirm="handleDeleteConfirm"
+    />
   </tr>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { Contact } from '@/types'
 
@@ -93,6 +103,7 @@ import EditIcon from '@/components/icons/EditIcon.vue'
 import ArchiveIcon from '@/components/icons/ArchiveIcon.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import RestoreIcon from '@/components/icons/RestoreIcon.vue'
+import ContactDeleteConfirmationOverlay from './ContactDeleteConfirmationOverlay.vue'
 import { formatDateToMonthDayYear } from '@/utils/dateFormat'
 
 interface Props {
@@ -105,8 +116,31 @@ interface Emits {
   delete: [contact: Contact]
 }
 
-defineProps<Props>()
-defineEmits<Emits>()
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+// State for delete confirmation overlay
+const showDeleteConfirm = ref(false)
+const isDeleting = ref(false)
+
+const handleCancel = () => {
+  if (!isDeleting.value) {
+    showDeleteConfirm.value = false
+  }
+}
+
+const handleDeleteConfirm = async () => {
+  isDeleting.value = true
+  try {
+    emit('delete', props.contact)
+    // The overlay will be hidden when the contact is removed from the list
+    // If there's an error, it will be handled by the parent component
+  } catch (error) {
+    // On error, hide the overlay and reset states
+    isDeleting.value = false
+    showDeleteConfirm.value = false
+  }
+}
 
 const formatDate = (date: Date): string => {
   return formatDateToMonthDayYear(date)

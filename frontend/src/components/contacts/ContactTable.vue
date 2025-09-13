@@ -93,8 +93,6 @@ const handleRestore = (contact: Contact) => {
 }
 
 const handleDelete = (contact: Contact) => {
-  if (confirm(`Are you sure you want to permanently delete ${contact.name}?`)) {
-    contactsStore.deleteContact(contact.id)
-  }
+  contactsStore.deleteContact(contact.id)
 }
 </script>

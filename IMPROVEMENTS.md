@@ -28,8 +28,7 @@ Due to lack of time, and to avoid adding unnecessary complexity, I chose not to 
 1. Some resources or silent errors can leave orphaned files in Supabase storage.  
 2. Some classes, functions, or components perform tasks that could ideally be abstracted into helpers, utils, or composables for better code organization and best practices.  
    For example, creating `BaseServices` or `BaseRepositories` would not have been justified given that the project only had one entity.  
-3. Permanent contact deletion is currently validated using the browser’s native confirmation dialog.  
-   Implementing a proper confirmation flow that matches the project’s UI would be more ideal.  
-4. To improve page-loading visibility and provide a more modern UI, skeleton loaders could have been added.  
-5. Some definitions are redundant, such as the `Contact` structure.  
+3. To improve page-loading visibility and provide a more modern UI, skeleton loaders could have been added.  
+4. Some definitions are redundant, such as the `Contact` structure.  
    Using tRPC or another solution to guarantee consistency between the backend and frontend models would have been ideal.  
+5. Some HTML elements should be smaller Vue Components.
