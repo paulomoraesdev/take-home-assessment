@@ -277,7 +277,8 @@ export const useContactsStore = defineStore('contacts', () => {
   }
 
   async function deleteContact(id: string): Promise<boolean> {
-    loading.value = true
+    // Don't use loading.value = true here as it hides the entire table
+    // For individual operations, we can rely on the contact being removed instantly
     error.value = null
     
     try {
@@ -285,9 +286,14 @@ export const useContactsStore = defineStore('contacts', () => {
       
       // Remove from local state
       const index = contacts.value.findIndex(contact => contact.id === id)
+
       if (index !== -1) {
         contacts.value.splice(index, 1)
         total.value = Math.max(0, total.value - 1)
+        
+        if (contacts.value.length === 0 && currentPage.value > 1) {
+          currentPage.value -= 1
+        }
       }
       
       // Update absolute total with validation to prevent negative values
@@ -299,7 +305,7 @@ export const useContactsStore = defineStore('contacts', () => {
       console.error('Error deleting contact:', err)
       return false
     } finally {
-      loading.value = false
+      // No need to set loading.value = false since we didn't set it to true
     }
   }
 
