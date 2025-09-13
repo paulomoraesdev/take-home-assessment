@@ -91,7 +91,21 @@ const cropperDefaultSize = {
 }
 
 // Default transforms to fit image in container
-const defaultTransforms = ({ cropper, imageSize }: any) => {
+const defaultTransforms = (params: any) => {
+  // Guard against undefined params or missing properties
+  if (!params || !params.cropper || !params.imageSize || 
+      !params.cropper.width || !params.cropper.height ||
+      !params.imageSize.width || !params.imageSize.height) {
+    return {
+      scaleX: 1,
+      scaleY: 1,
+      translateX: 0,
+      translateY: 0
+    }
+  }
+
+  const { cropper, imageSize } = params
+  
   return {
     scaleX: Math.min(cropper.width / imageSize.width, cropper.height / imageSize.height),
     scaleY: Math.min(cropper.width / imageSize.width, cropper.height / imageSize.height),
