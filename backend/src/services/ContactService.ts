@@ -70,12 +70,14 @@ export class ContactService {
 
     const [data, total] = await Promise.all([
       this.repository.getAll(page, limit, filter, orderBy),
-      this.repository.count(filter),
-      isStatusIncluded && this.repository.getAll(1, 1, { deletedAt: null })
+      this.repository.count(filter)
     ]);
 
-    let hasContacts = null;
-    if (isStatusIncluded)  hasContacts = await this.repository.getAll(1, 1, { deletedAt: null })
+    let totalExistingContacts: number | null = null;
+    if (isStatusIncluded) {
+      // Get precise count of existing contacts (not deleted - includes both active and archived)
+      totalExistingContacts = await this.repository.count({ deletedAt: null });
+    }
 
     return {
       data,
@@ -84,7 +86,10 @@ export class ContactService {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
-        hasContacts: hasContacts && !!hasContacts
+        ...(isStatusIncluded && totalExistingContacts !== null && { 
+          hasContacts: totalExistingContacts > 0,
+          totalExistingContacts 
+        })
       },
     };
   }

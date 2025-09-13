@@ -175,9 +175,12 @@ export const useContactsStore = defineStore('contacts', () => {
       total.value = response.meta.total
       totalPages.value = response.meta.totalPages
       
-      // Update totalContacts based on hasContacts from backend
-      if (typeof response.meta.hasContacts === 'boolean') {
-        // Backend provided hasContacts - use it to determine if we have any contacts
+      // Update totalContacts with precise count from backend
+      if (typeof response.meta.totalExistingContacts === 'number') {
+        // Backend provided precise count - use it directly
+        totalContacts.value = response.meta.totalExistingContacts
+      } else if (typeof response.meta.hasContacts === 'boolean') {
+        // Fallback to boolean logic for backward compatibility
         totalContacts.value = response.meta.hasContacts ? 1 : 0
       }
       
@@ -284,11 +287,11 @@ export const useContactsStore = defineStore('contacts', () => {
       const index = contacts.value.findIndex(contact => contact.id === id)
       if (index !== -1) {
         contacts.value.splice(index, 1)
-        total.value -= 1
+        total.value = Math.max(0, total.value - 1)
       }
       
-      // Update absolute total
-      totalContacts.value -= 1
+      // Update absolute total with validation to prevent negative values
+      totalContacts.value = Math.max(0, totalContacts.value - 1)
       
       return true
     } catch (err) {

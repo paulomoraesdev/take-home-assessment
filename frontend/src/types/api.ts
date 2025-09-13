@@ -14,6 +14,7 @@ export interface PaginatedResponse<T> {
     total: number
     totalPages: number
     hasContacts?: boolean // Optional field when includeStats=true
+    totalExistingContacts?: number // Optional field when includeStats=true - includes active and archived (not deleted)
   }
 }
 
