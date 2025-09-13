@@ -43,6 +43,8 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 
 ## How to Run
 
+### Alternative 1: Using my keys
+
 1. **Clone the repository**
    ```bash
    git clone <repo-url>
@@ -58,13 +60,50 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
    ```
 
 3. **Configure environment variables**
-   - Copy `backend/.env.example` to `backend/.env` and fill in the values.  
-   - Copy `frontend/.env.example` to `frontend/.env` and fill in the values.  
+   - Copy `backend/.env.example` to `backend/.env` and fill in the values i've provided via email
+   - Copy `frontend/.env.example` to `frontend/.env` and fill in the values i've provided via email 
+
+4. **Run in development mode**
+   In one terminal:
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+   In another terminal:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+---
+
+### Alternative 2: Do a full setup
+
+To use this option, you'll need to setup a supabase project.
+
+1. **Clone the repository**
+   ```bash
+   git clone <repo-url>
+   cd take-home-assessment
+   ```
+
+2. **Install dependencies**
+   ```bash
+   cd backend
+   npm install
+   cd ../frontend
+   npm install
+   ```
+
+3. **Configure environment variables**
+   - Copy `backend/.env.example` to `backend/.env` and fill in the values
+   - Copy `frontend/.env.example` to `frontend/.env` and fill in the values
 
 4. **Prepare the database**
    ```bash
    cd backend
-   npx prisma migrate dev // YOU NEED TO RUN THE MIGRATION JUST IF YOU DECIDE TO USE A FRESH DATABASE
+   npx prisma migrate dev
    ```
 
 5. **Run in development mode**
@@ -80,23 +119,12 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
    npm run dev
    ```
 
-6. **Build and preview the frontend**
-   ```bash
-   cd frontend
-   npm run build
-   npm run preview
-   ```
-
----
-
-## (Optional) Seed Data
-
-If you want to populate the database with sample contacts, run the seed:
-
-```bash
-cd backend
-npm run seed
-```
+6. **(Optional) Seed Data**
+  If you want to populate the database with sample contacts, run the seed:
+  ```bash
+    cd backend
+    npm run seed
+  ```
 
 ⚠️ **Note:**  
 The seed script **does not perform image upload or cropping**.  
