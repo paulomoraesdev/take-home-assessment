@@ -6,6 +6,8 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 
 [Preview](https://youtu.be/fu4JJydWcfQ)
 
+You can read DECISIONS.md and IMPROVEMENTS.md to know what i didn't have enough time to do or why i didn't decide to.
+
 ## Stack
 
 ### Backend
