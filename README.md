@@ -6,6 +6,11 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 
 [Preview](https://youtu.be/fu4JJydWcfQ)
 
+<div align="center">
+  <img src="reference-1.png" alt="Application Screenshot 1" width="400" style="margin-right:  10px;">
+  <img src="reference-2.png" alt="Application Screenshot 2" width="400">
+</div>
+
 You can read DECISIONS.md and IMPROVEMENTS.md to know what i didn't have enough time to do or why i didn't decide to.
 
 ## Stack
