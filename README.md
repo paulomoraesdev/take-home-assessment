@@ -4,6 +4,8 @@ Full-stack application for contact management.
 The API is built with Fastify and exposes endpoints to list, create, update, and delete contacts.  
 The frontend is developed with Vue 3, consuming this API and providing an interface to manage the records.
 
+[Preview](https://youtu.be/fu4JJydWcfQ)
+
 ## Stack
 
 ### Backend
