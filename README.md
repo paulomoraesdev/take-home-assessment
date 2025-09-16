@@ -25,8 +25,6 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 
 ## Environment Variables
 
-**IMPORTANT!: I sent my own TOKENS via email, if you want to avoid setting up a new Supabase instance or adding new databases, you can use it and avoid running the migrations**
-
 ### Backend (`backend/.env`)
 - `API_PORT` – server port.  
 - `CORS_ORIGIN` – allowed origin for CORS.  
@@ -43,44 +41,9 @@ The frontend is developed with Vue 3, consuming this API and providing an interf
 
 ## How to Run
 
-### Alternative 1: Using my keys
+### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repo-url>
-   cd take-home-assessment
-   ```
-
-2. **Install dependencies**
-   ```bash
-   cd backend
-   npm install
-   cd ../frontend
-   npm install
-   ```
-
-3. **Configure environment variables**
-   - Copy `backend/.env.example` to `backend/.env` and fill in the values i've provided via email
-   - Copy `frontend/.env.example` to `frontend/.env` and fill in the values i've provided via email 
-
-4. **Run in development mode**
-   In one terminal:
-   ```bash
-   cd backend
-   npm run dev
-   ```
-
-   In another terminal:
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-
----
-
-### Alternative 2: Do a full setup
-
-To use this option, you'll need to setup a supabase project.
+Before setting up the project, you'll need to a supabase project.
 
 1. **Clone the repository**
    ```bash
